@@ -1,6 +1,10 @@
 ---
-layout: post
-title: Dataframes
+layout:     post
+title:      "Dataframes"
+subtitle:   ""
+date:       2014-11-11 12:00:00
+author:     ""
+header-img: "img/post-bg-06.jpg"
 ---
 
 I have been playing a lot lately with [Julia](http://julialang.org/).
