@@ -43,12 +43,11 @@ layout: default
                 </ul>
 
             </div>
+            <div class="comments">
+	    	{% include disqus.html disqus_identifier=page.disqus_identifier %}
+	    </div>
         </div>
-        <div class="comments">
-    {% include disqus.html disqus_identifier=page.disqus_identifier %}
-  </div>
     </div>
-    
 </article>
 
 <hr>
