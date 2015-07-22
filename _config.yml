@@ -7,6 +7,8 @@ baseurl: ""
 url: "http://ajkl.github.io"
 twitter_username: ajinkyakale
 github_username:  ajkl
+disqus: ajinkyakale
+google_analytics: UA-57080517-1
 
 # Build settings
 markdown: kramdown
