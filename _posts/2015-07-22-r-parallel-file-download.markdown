@@ -8,10 +8,10 @@ header-img: "img/post-bg-05.jpg"
 ---
 
 I had a csv with 5 columns with one of the columns having image urls (picture_url) and one of them having the image id (id).
-And I had 100,000 of these.
+And I had 100,000 of these.<br>
 Task was to download all the images with image-id as the image name.
 
-I tried regular download.file() in R but that soon turned out to be an epic fail.
+I tried regular download.file() in R but that soon turned out to be an epic fail.<br>
 Hello doParallel!
 
 {% highlight r %}
@@ -22,7 +22,7 @@ image.df <- read.table("images.csv",
 {% endhighlight %}
 
 You can find the number of cores on linix using [lscpu](http://manpages.ubuntu.com/manpages/saucy/man1/lscpu.1.html) ```lscpu```
-Register the cores with doParallel
+<br>Register the cores with doParallel
 
 {% highlight r %}
 require(doParallel)
