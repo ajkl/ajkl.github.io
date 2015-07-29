@@ -1,7 +1,7 @@
 Ajinkya Kale
 ============
 _1-734-604-4176_  
-@ajinkyakale
+[@ajinkyakale](https://twitter.com/ajinkyakale)  
 kaleajinkya@gmail.com  
 http://ajkl.github.io
 
