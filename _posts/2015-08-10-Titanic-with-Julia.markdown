@@ -16,11 +16,10 @@ The benchmark numbers on the Julia website look pretty impressive. So get ready 
 ![benchmark](https://raw.githubusercontent.com/ajkl/ajkl.github.io/master/img/Julia_benchmark.png)
 
 Lets get started. We will mostly be using 3 main packages from Julia ecosystem
-<ol>
-<li>[DataFrames](https://github.com/JuliaStats/DataFrames.jl)</li>
-<li>[Gadfly](http://gadflyjl.org/)</li>
-<li>[DecisionTree](https://github.com/bensadeghi/DecisionTree.jl)</li>
-</ol>
+
+* [DataFrames](https://github.com/JuliaStats/DataFrames.jl)
+* [Gadfly](http://gadflyjl.org/)
+* [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl)
 
 We start with loading the dataset from the Titanic Competition from kaggle. We will use readtable for that and inspect the first few data points with head() on the loaded DataFrame. 
 We will use the already split train and test sets from DataCamp  
