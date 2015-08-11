@@ -1,13 +1,13 @@
 ---
 layout:     post
-title:      "Dataframes"
+title:      "Titanic with Julia"
 subtitle:   ""
 date:       2014-11-23 12:00:00
 author:     ""
 header-img: "img/post-bg-06.jpg"
 ---
 
-# Julia on Titanic
+# Titanic with Julia
 
 This is an introduction to Data Analysis and Decision Trees using Julia. In this tutorial we will explore how to tackle (Kaggle's Titanic competition)[https://www.kaggle.com/c/titanic] using Julia and Machine Learning. This tutorial is adopted from the [Kaggle R tutorial on Machine Learning](https://campus.datacamp.com/courses/kaggle-r-tutorial-on-machine-learning) on [Datacamp](https://www.datacamp.com/) In case you're new to Julia, you can read more about its awesomeness on [julialang.org](http://julialang.org/). The benchmark numbers on the Julia website look pretty impressive.
 
