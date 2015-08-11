@@ -10,21 +10,21 @@ header-img: "img/post-bg-06.jpg"
 # Julia on Titanic
 
 This is an introduction to Data Analysis and Decision Trees using Julia. In this tutorial we will explore how to tackle [Kaggle's Titanic competition](https://www.kaggle.com/c/titanic) using Julia and Machine Learning. This tutorial is adopted from the [Kaggle R tutorial on Machine Learning](https://campus.datacamp.com/courses/kaggle-r-tutorial-on-machine-learning) on [Datacamp](https://www.datacamp.com/) In case you're new to Julia, you can read more about its awesomeness on [julialang.org](http://julialang.org/).  
-Again, the point of this tutorial is not to teach machine learning but to provide a starting point to get your hands dirty with Julia code.
+Again, the point of this tutorial is not to teach machine learning but to provide a starting point to get your hands dirty with Julia code.  
 The benchmark numbers on the Julia website look pretty impressive. So get ready to embrace Julia with a warm hug!
 
 ![benchmark](https://raw.githubusercontent.com/ajkl/ajkl.github.io/master/img/Julia_benchmark.png)
 
 Lets get started. We will mostly be using 3 main packages from Julia ecosystem
-1. [DataFrames](https://github.com/JuliaStats/DataFrames.jl)
-2. [Gadfly](http://gadflyjl.org/)
-3. [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl)
+* [DataFrames](https://github.com/JuliaStats/DataFrames.jl)    
+* [Gadfly](http://gadflyjl.org/)
+* [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl)
 
 We start with loading the dataset from the Titanic Competition from kaggle. We will use readtable for that and inspect the first few data points with head() on the loaded DataFrame. 
-We will use the already split train and test sets from DataCamp
-training set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.csv
-test set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv
-I have them downloaded in the data directory.
+We will use the already split train and test sets from DataCamp  
+training set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.csv  
+test set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv  
+I have them downloaded in the data directory.  
 
 
     using DataFrames
