@@ -1,3 +1,11 @@
+---
+layout:     post
+title:      "Dataframes"
+subtitle:   ""
+date:       2014-11-23 12:00:00
+author:     ""
+header-img: "img/post-bg-06.jpg"
+---
 
 # Julia on Titanic
 
