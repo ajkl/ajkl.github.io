@@ -7,17 +7,18 @@ author:     ""
 header-img: "img/post-bg-06.jpg"
 ---
 
-# Titanic with Julia
+# Julia on Titanic
 
-This is an introduction to Data Analysis and Decision Trees using Julia. In this tutorial we will explore how to tackle (Kaggle's Titanic competition)[https://www.kaggle.com/c/titanic] using Julia and Machine Learning. This tutorial is adopted from the [Kaggle R tutorial on Machine Learning](https://campus.datacamp.com/courses/kaggle-r-tutorial-on-machine-learning) on [Datacamp](https://www.datacamp.com/) In case you're new to Julia, you can read more about its awesomeness on [julialang.org](http://julialang.org/). The benchmark numbers on the Julia website look pretty impressive.
+This is an introduction to Data Analysis and Decision Trees using Julia. In this tutorial we will explore how to tackle [Kaggle's Titanic competition](https://www.kaggle.com/c/titanic) using Julia and Machine Learning. This tutorial is adopted from the [Kaggle R tutorial on Machine Learning](https://campus.datacamp.com/courses/kaggle-r-tutorial-on-machine-learning) on [Datacamp](https://www.datacamp.com/) In case you're new to Julia, you can read more about its awesomeness on [julialang.org](http://julialang.org/).  
+Again, the point of this tutorial is not to teach machine learning but to provide a starting point to get your hands dirty with Julia code.
+The benchmark numbers on the Julia website look pretty impressive. So get ready to embrace Julia with a warm hug!
 
-
-![png](../img/Julia_benchmark.png)
+![benchmark](https://raw.githubusercontent.com/ajkl/ajkl.github.io/master/img/Julia_benchmark.png)
 
 Lets get started. We will mostly be using 3 main packages from Julia ecosystem
-1. (DataFrames)[https://github.com/JuliaStats/DataFrames.jl]
-2. (Gadfly)[http://gadflyjl.org/]
-3. (DecisionTree)[https://github.com/bensadeghi/DecisionTree.jl]
+1. [DataFrames](https://github.com/JuliaStats/DataFrames.jl)
+2. [Gadfly](http://gadflyjl.org/)
+3. [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl)
 
 We start with loading the dataset from the Titanic Competition from kaggle. We will use readtable for that and inspect the first few data points with head() on the loaded DataFrame. 
 We will use the already split train and test sets from DataCamp
@@ -27,6 +28,7 @@ I have them downloaded in the data directory.
 
 
     using DataFrames
+
 
     train = readtable("data/train.csv")
     head(train)
@@ -46,6 +48,16 @@ I have them downloaded in the data directory.
 
 
 <table class="data-frame"><tr><th></th><th>PassengerId</th><th>Pclass</th><th>Name</th><th>Sex</th><th>Age</th><th>SibSp</th><th>Parch</th><th>Ticket</th><th>Fare</th><th>Cabin</th><th>Embarked</th></tr><tr><th>1</th><td>892</td><td>3</td><td>Kelly, Mr. James</td><td>male</td><td>34.5</td><td>0</td><td>0</td><td>330911</td><td>7.8292</td><td>NA</td><td>Q</td></tr><tr><th>2</th><td>893</td><td>3</td><td>Wilkes, Mrs. James (Ellen Needs)</td><td>female</td><td>47.0</td><td>1</td><td>0</td><td>363272</td><td>7.0</td><td>NA</td><td>S</td></tr><tr><th>3</th><td>894</td><td>2</td><td>Myles, Mr. Thomas Francis</td><td>male</td><td>62.0</td><td>0</td><td>0</td><td>240276</td><td>9.6875</td><td>NA</td><td>Q</td></tr><tr><th>4</th><td>895</td><td>3</td><td>Wirz, Mr. Albert</td><td>male</td><td>27.0</td><td>0</td><td>0</td><td>315154</td><td>8.6625</td><td>NA</td><td>S</td></tr><tr><th>5</th><td>896</td><td>3</td><td>Hirvonen, Mrs. Alexander (Helga E Lindqvist)</td><td>female</td><td>22.0</td><td>1</td><td>1</td><td>3101298</td><td>12.2875</td><td>NA</td><td>S</td></tr><tr><th>6</th><td>897</td><td>3</td><td>Svensson, Mr. Johan Cervin</td><td>male</td><td>14.0</td><td>0</td><td>0</td><td>7538</td><td>9.225</td><td>NA</td><td>S</td></tr></table>
+
+
+
+
+    size(train, 1)
+
+
+
+
+    891
 
 
 
@@ -162,107 +174,7 @@ Lets take a closer look at our datasets. ```describe()``` helps us to summarize 
     
 
 
-
-    describe(test)
-
-    PassengerId
-    Min      892.0
-    1st Qu.  996.25
-    Median   1100.5
-    Mean     1100.5
-    3rd Qu.  1204.75
-    Max      1309.0
-    NAs      0
-    NA%      0.0%
-    
-    Pclass
-    Min      1.0
-    1st Qu.  1.0
-    Median   3.0
-    Mean     2.2655502392344498
-    3rd Qu.  3.0
-    Max      3.0
-    NAs      0
-    NA%      0.0%
-    
-    Name
-    Length  418
-    Type    UTF8String
-    NAs     0
-    NA%     0.0%
-    Unique  418
-    
-    Sex
-    Length  418
-    Type    UTF8String
-    NAs     0
-    NA%     0.0%
-    Unique  2
-    
-    Age
-    Min      0.17
-    1st Qu.  21.0
-    Median   27.0
-    Mean     30.272590361445783
-    3rd Qu.  39.0
-    Max      76.0
-    NAs      86
-    NA%      20.57%
-    
-    SibSp
-    Min      0.0
-    1st Qu.  0.0
-    Median   0.0
-    Mean     0.4473684210526316
-    3rd Qu.  1.0
-    Max      8.0
-    NAs      0
-    NA%      0.0%
-    
-    Parch
-    Min      0.0
-    1st Qu.  0.0
-    Median   0.0
-    Mean     0.3923444976076555
-    3rd Qu.  0.0
-    Max      9.0
-    NAs      0
-    NA%      0.0%
-    
-    Ticket
-    Length  418
-    Type    UTF8String
-    NAs     0
-    NA%     0.0%
-    Unique  363
-    
-    Fare
-    Min      0.0
-    1st Qu.  7.8958
-    Median   14.4542
-    Mean     35.62718848920864
-    3rd Qu.  31.5
-    Max      512.3292
-    NAs      1
-    NA%      0.24%
-    
-    Cabin
-    Length  418
-    Type    UTF8String
-    NAs     327
-    NA%     78.23%
-    Unique  77
-    
-    Embarked
-    Length  418
-    Type    UTF8String
-    NAs     0
-    NA%     0.0%
-    Unique  3
-    
-
-
-If you want to just check the datatypes of the columns you can use ```eltypes```
+If you want to just check the datatypes of the columns you can use ```eltypes()```
 
 
     eltypes(train)
@@ -347,7 +259,6 @@ If you want proportions like ```prop.table()``` in R, you can use ```proportions
 ```Counts()``` does not work for categorical variables, so you can use ```countmap()`` there.
 
 
-    #categorical variable equivalent of counts is countmap. Counts will not work on categorical data
     countmap(train[:Sex])
 
 
@@ -382,382 +293,382 @@ We will examine this using a stacked histogram of Sex vs Survived using Gadfly p
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-ef53c9e148bf4bc5b19af8e81d13087f">
-<g class="plotroot yscalable" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-2">
+     id="fig-6f2c425000ec489abdba89ac4c88f8f7">
+<g class="plotroot yscalable" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-2">
     <text x="70.87" y="88.39" text-anchor="middle" dy="0.6em">Sex</text>
   </g>
-  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-3">
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-3">
     <text x="45.25" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">male</text>
     <text x="96.49" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">female</text>
   </g>
-  <g class="guide colorkey" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-4">
-    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-5">
-      <text x="125.93" y="42.86" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-6" class="color_0">0</text>
-      <text x="125.93" y="46.48" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-7" class="color_1">1</text>
+  <g class="guide colorkey" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-4">
+    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-5">
+      <text x="125.93" y="42.86" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-6" class="color_0">0</text>
+      <text x="125.93" y="46.48" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-7" class="color_1">1</text>
     </g>
-    <g stroke="#000000" stroke-opacity="0.000" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-8">
-      <rect x="123.11" y="41.95" width="1.81" height="1.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-9" class="color_0" fill="#FF0000"/>
-      <rect x="123.11" y="45.58" width="1.81" height="1.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-10" class="color_1" fill="#008000"/>
+    <g stroke="#000000" stroke-opacity="0.000" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-8">
+      <rect x="123.11" y="41.95" width="1.81" height="1.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-9" class="color_0" fill="#FF0000"/>
+      <rect x="123.11" y="45.58" width="1.81" height="1.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-10" class="color_1" fill="#008000"/>
     </g>
-    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-11">
-      <text x="123.11" y="39.04" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-12">Survived</text>
+    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-11">
+      <text x="123.11" y="39.04" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-12">Survived</text>
     </g>
   </g>
-  <g clip-path="url(#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-14)" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-13">
-    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-15">
-      <rect x="19.63" y="5" width="102.48" height="75.72" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-16"/>
+  <g clip-path="url(#fig-6f2c425000ec489abdba89ac4c88f8f7-element-14)" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-13">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-15">
+      <rect x="19.63" y="5" width="102.48" height="75.72" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-16"/>
     </g>
-    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-17">
-      <path fill="none" d="M19.63,162.38 L 122.11 162.38" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-18" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-19" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-20" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-21" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-22" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-23" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-24" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-25" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-26" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-27" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-28" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-29" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-30" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-31" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-32" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-33" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-34" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-35" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-36" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-37" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-76.67 L 122.11 -76.67" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-38" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-39" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,148.04 L 122.11 148.04" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-40" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,145.65 L 122.11 145.65" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-41" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,143.26 L 122.11 143.26" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-42" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,140.87 L 122.11 140.87" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-43" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-44" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,136.09 L 122.11 136.09" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-45" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,133.7 L 122.11 133.7" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-46" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,131.31 L 122.11 131.31" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-47" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,128.92 L 122.11 128.92" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-48" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-49" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,124.13 L 122.11 124.13" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-50" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,121.74 L 122.11 121.74" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-51" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,119.35 L 122.11 119.35" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-52" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,116.96 L 122.11 116.96" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-53" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-54" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,112.18 L 122.11 112.18" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-55" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,109.79 L 122.11 109.79" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-56" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,107.4 L 122.11 107.4" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-57" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,105.01 L 122.11 105.01" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-58" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-59" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,100.23 L 122.11 100.23" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-60" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,97.84 L 122.11 97.84" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-61" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,95.45 L 122.11 95.45" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-62" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,93.06 L 122.11 93.06" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-63" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-64" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,88.28 L 122.11 88.28" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-65" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,85.89 L 122.11 85.89" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-66" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,83.5 L 122.11 83.5" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-67" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,81.11 L 122.11 81.11" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-68" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-69" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,76.32 L 122.11 76.32" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-70" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,73.93 L 122.11 73.93" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-71" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,71.54 L 122.11 71.54" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,69.15 L 122.11 69.15" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-73" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-74" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,64.37 L 122.11 64.37" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-75" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,61.98 L 122.11 61.98" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-76" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,59.59 L 122.11 59.59" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-77" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,57.2 L 122.11 57.2" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-78" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-79" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,52.42 L 122.11 52.42" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-80" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,50.03 L 122.11 50.03" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-81" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,47.64 L 122.11 47.64" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-82" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,45.25 L 122.11 45.25" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-83" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-84" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,40.47 L 122.11 40.47" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-85" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,38.08 L 122.11 38.08" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-86" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,35.69 L 122.11 35.69" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-87" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,33.3 L 122.11 33.3" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-88" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-89" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,28.51 L 122.11 28.51" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-90" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,26.12 L 122.11 26.12" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-91" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,23.73 L 122.11 23.73" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-92" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,21.34 L 122.11 21.34" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-93" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-94" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,16.56 L 122.11 16.56" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-95" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,14.17 L 122.11 14.17" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-96" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,11.78 L 122.11 11.78" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-97" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,9.39 L 122.11 9.39" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-98" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-99" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,4.61 L 122.11 4.61" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-100" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,2.22 L 122.11 2.22" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-101" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-0.17 L 122.11 -0.17" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-102" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-2.56 L 122.11 -2.56" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-103" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-104" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-7.34 L 122.11 -7.34" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-105" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-9.73 L 122.11 -9.73" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-106" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-12.12 L 122.11 -12.12" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-107" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-14.51 L 122.11 -14.51" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-108" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-109" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-19.3 L 122.11 -19.3" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-110" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-21.69 L 122.11 -21.69" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-111" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-24.08 L 122.11 -24.08" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-112" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-26.47 L 122.11 -26.47" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-113" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-114" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-31.25 L 122.11 -31.25" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-115" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-33.64 L 122.11 -33.64" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-116" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-36.03 L 122.11 -36.03" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-117" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-38.42 L 122.11 -38.42" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-118" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-119" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-43.2 L 122.11 -43.2" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-120" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-45.59 L 122.11 -45.59" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-121" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-47.98 L 122.11 -47.98" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-122" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-50.37 L 122.11 -50.37" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-123" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-124" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-55.15 L 122.11 -55.15" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-125" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-57.54 L 122.11 -57.54" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-126" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-59.93 L 122.11 -59.93" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-127" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-62.32 L 122.11 -62.32" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-128" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-129" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,198.24 L 122.11 198.24" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-130" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-131" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-132" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M19.63,-160.33 L 122.11 -160.33" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-133" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-134" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,144.45 L 122.11 144.45" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-135" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-136" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,132.5 L 122.11 132.5" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-137" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-138" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,120.55 L 122.11 120.55" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-139" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-140" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,108.6 L 122.11 108.6" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-141" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-142" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,96.64 L 122.11 96.64" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-143" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-144" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,84.69 L 122.11 84.69" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-145" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-146" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,72.74 L 122.11 72.74" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-147" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-148" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,60.79 L 122.11 60.79" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-149" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-150" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,48.83 L 122.11 48.83" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-151" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-152" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,36.88 L 122.11 36.88" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-153" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-154" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,24.93 L 122.11 24.93" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-155" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-156" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,12.98 L 122.11 12.98" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-157" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-158" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,1.02 L 122.11 1.02" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-159" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-160" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-10.93 L 122.11 -10.93" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-161" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-162" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-22.88 L 122.11 -22.88" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-163" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-164" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-34.83 L 122.11 -34.83" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-165" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-166" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-46.79 L 122.11 -46.79" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-167" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-168" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-58.74 L 122.11 -58.74" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-169" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-170" gadfly:scale="5.0" visibility="hidden"/>
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-17">
+      <path fill="none" d="M19.63,162.38 L 122.11 162.38" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-18" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-19" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-20" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-21" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-22" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-23" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-24" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-25" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-26" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-27" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-28" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-29" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-30" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-31" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-32" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-33" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-34" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-35" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-36" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-37" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-76.67 L 122.11 -76.67" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-38" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-39" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,148.04 L 122.11 148.04" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-40" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,145.65 L 122.11 145.65" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-41" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,143.26 L 122.11 143.26" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-42" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,140.87 L 122.11 140.87" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-43" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-44" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,136.09 L 122.11 136.09" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-45" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,133.7 L 122.11 133.7" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-46" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,131.31 L 122.11 131.31" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-47" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,128.92 L 122.11 128.92" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-48" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-49" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,124.13 L 122.11 124.13" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-50" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,121.74 L 122.11 121.74" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-51" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,119.35 L 122.11 119.35" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-52" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,116.96 L 122.11 116.96" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-53" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-54" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,112.18 L 122.11 112.18" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-55" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,109.79 L 122.11 109.79" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-56" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,107.4 L 122.11 107.4" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-57" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,105.01 L 122.11 105.01" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-58" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-59" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,100.23 L 122.11 100.23" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-60" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,97.84 L 122.11 97.84" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-61" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,95.45 L 122.11 95.45" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-62" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,93.06 L 122.11 93.06" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-63" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-64" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,88.28 L 122.11 88.28" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-65" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,85.89 L 122.11 85.89" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-66" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,83.5 L 122.11 83.5" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-67" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,81.11 L 122.11 81.11" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-68" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-69" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,76.32 L 122.11 76.32" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-70" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,73.93 L 122.11 73.93" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-71" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,71.54 L 122.11 71.54" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-72" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,69.15 L 122.11 69.15" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-73" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-74" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,64.37 L 122.11 64.37" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-75" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,61.98 L 122.11 61.98" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-76" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,59.59 L 122.11 59.59" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-77" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,57.2 L 122.11 57.2" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-78" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-79" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,52.42 L 122.11 52.42" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-80" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,50.03 L 122.11 50.03" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-81" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,47.64 L 122.11 47.64" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-82" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,45.25 L 122.11 45.25" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-83" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-84" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,40.47 L 122.11 40.47" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-85" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,38.08 L 122.11 38.08" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-86" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,35.69 L 122.11 35.69" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-87" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,33.3 L 122.11 33.3" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-88" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-89" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,28.51 L 122.11 28.51" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-90" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,26.12 L 122.11 26.12" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-91" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,23.73 L 122.11 23.73" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-92" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,21.34 L 122.11 21.34" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-93" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-94" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,16.56 L 122.11 16.56" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-95" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,14.17 L 122.11 14.17" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-96" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,11.78 L 122.11 11.78" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-97" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,9.39 L 122.11 9.39" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-98" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-99" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,4.61 L 122.11 4.61" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-100" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,2.22 L 122.11 2.22" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-101" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-0.17 L 122.11 -0.17" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-102" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-2.56 L 122.11 -2.56" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-103" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-104" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-7.34 L 122.11 -7.34" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-105" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-9.73 L 122.11 -9.73" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-106" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-12.12 L 122.11 -12.12" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-107" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-14.51 L 122.11 -14.51" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-108" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-109" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-19.3 L 122.11 -19.3" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-110" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-21.69 L 122.11 -21.69" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-111" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-24.08 L 122.11 -24.08" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-112" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-26.47 L 122.11 -26.47" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-113" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-114" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-31.25 L 122.11 -31.25" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-115" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-33.64 L 122.11 -33.64" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-116" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-36.03 L 122.11 -36.03" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-117" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-38.42 L 122.11 -38.42" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-118" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-119" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-43.2 L 122.11 -43.2" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-120" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-45.59 L 122.11 -45.59" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-121" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-47.98 L 122.11 -47.98" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-122" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-50.37 L 122.11 -50.37" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-123" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-124" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-55.15 L 122.11 -55.15" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-125" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-57.54 L 122.11 -57.54" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-126" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-59.93 L 122.11 -59.93" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-127" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-62.32 L 122.11 -62.32" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-128" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-129" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,198.24 L 122.11 198.24" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-130" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-131" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-132" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M19.63,-160.33 L 122.11 -160.33" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-133" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M19.63,150.43 L 122.11 150.43" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-134" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,144.45 L 122.11 144.45" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-135" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,138.48 L 122.11 138.48" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-136" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,132.5 L 122.11 132.5" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-137" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,126.52 L 122.11 126.52" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-138" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,120.55 L 122.11 120.55" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-139" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,114.57 L 122.11 114.57" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-140" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,108.6 L 122.11 108.6" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-141" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,102.62 L 122.11 102.62" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-142" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,96.64 L 122.11 96.64" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-143" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,90.67 L 122.11 90.67" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-144" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,84.69 L 122.11 84.69" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-145" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,78.71 L 122.11 78.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-146" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,72.74 L 122.11 72.74" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-147" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,66.76 L 122.11 66.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-148" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,60.79 L 122.11 60.79" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-149" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,54.81 L 122.11 54.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-150" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,48.83 L 122.11 48.83" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-151" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,42.86 L 122.11 42.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-152" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,36.88 L 122.11 36.88" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-153" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,30.9 L 122.11 30.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-154" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,24.93 L 122.11 24.93" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-155" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,18.95 L 122.11 18.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-156" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,12.98 L 122.11 12.98" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-157" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,7 L 122.11 7" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-158" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,1.02 L 122.11 1.02" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-159" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-4.95 L 122.11 -4.95" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-160" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-10.93 L 122.11 -10.93" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-161" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-16.9 L 122.11 -16.9" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-162" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-22.88 L 122.11 -22.88" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-163" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-28.86 L 122.11 -28.86" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-164" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-34.83 L 122.11 -34.83" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-165" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-40.81 L 122.11 -40.81" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-166" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-46.79 L 122.11 -46.79" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-167" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-52.76 L 122.11 -52.76" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-168" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-58.74 L 122.11 -58.74" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-169" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M19.63,-64.71 L 122.11 -64.71" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-170" gadfly:scale="5.0" visibility="hidden"/>
     </g>
-    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-171">
-      <path fill="none" d="M70.87,5 L 70.87 80.72" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-172" gadfly:scale="1.0"/>
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-171">
+      <path fill="none" d="M70.87,5 L 70.87 80.72" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-172" gadfly:scale="1.0"/>
     </g>
-    <g class="plotpanel" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-173">
-      <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-174">
-        <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-175">
-          <rect x="19.61" y="65.69" width="51.29" height="13.03" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-176" fill="#008000"/>
-          <rect x="70.85" y="50.87" width="51.29" height="27.85" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-177" fill="#008000"/>
-          <rect x="19.61" y="9.75" width="51.29" height="55.94" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-178" fill="#FF0000"/>
-          <rect x="70.85" y="41.18" width="51.29" height="9.68" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-179" fill="#FF0000"/>
+    <g class="plotpanel" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-173">
+      <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-174">
+        <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-175">
+          <rect x="19.61" y="65.69" width="51.29" height="13.03" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-176" fill="#008000"/>
+          <rect x="70.85" y="50.87" width="51.29" height="27.85" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-177" fill="#008000"/>
+          <rect x="19.61" y="9.75" width="51.29" height="55.94" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-178" fill="#FF0000"/>
+          <rect x="70.85" y="41.18" width="51.29" height="9.68" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-179" fill="#FF0000"/>
         </g>
       </g>
     </g>
-    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-180">
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-181">
-        <rect x="115.11" y="8" width="4" height="4" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-182"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-183">
-          <path d="M115.91,9.6 L 116.71 9.6 116.71 8.8 117.51 8.8 117.51 9.6 118.31 9.6 118.31 10.4 117.51 10.4 117.51 11.2 116.71 11.2 116.71 10.4 115.91 10.4 z" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-184"/>
+    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-180">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-181">
+        <rect x="115.11" y="8" width="4" height="4" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-182"/>
+        <g class="button_logo" fill="#6A6A6A" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-183">
+          <path d="M115.91,9.6 L 116.71 9.6 116.71 8.8 117.51 8.8 117.51 9.6 118.31 9.6 118.31 10.4 117.51 10.4 117.51 11.2 116.71 11.2 116.71 10.4 115.91 10.4 z" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-184"/>
         </g>
       </g>
-      <g fill="#EAEAEA" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-185">
-        <rect x="95.61" y="8" width="19" height="4" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-186"/>
+      <g fill="#EAEAEA" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-185">
+        <rect x="95.61" y="8" width="19" height="4" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-186"/>
       </g>
-      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187">
-        <rect x="104.11" y="8" width="2" height="4" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-188"/>
+      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-187">
+        <rect x="104.11" y="8" width="2" height="4" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-188"/>
       </g>
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-189">
-        <rect x="91.11" y="8" width="4" height="4" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-190"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-191">
-          <path d="M91.91,9.6 L 94.31 9.6 94.31 10.4 91.91 10.4 z" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-192"/>
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-189">
+        <rect x="91.11" y="8" width="4" height="4" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-190"/>
+        <g class="button_logo" fill="#6A6A6A" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-191">
+          <path d="M91.91,9.6 L 94.31 9.6 94.31 10.4 91.91 10.4 z" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-192"/>
         </g>
       </g>
     </g>
   </g>
-  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-193">
-    <text x="18.63" y="162.38" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-194" gadfly:scale="1.0" visibility="hidden">-700</text>
-    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-195" gadfly:scale="1.0" visibility="hidden">-600</text>
-    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-196" gadfly:scale="1.0" visibility="hidden">-500</text>
-    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-197" gadfly:scale="1.0" visibility="hidden">-400</text>
-    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-198" gadfly:scale="1.0" visibility="hidden">-300</text>
-    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-199" gadfly:scale="1.0" visibility="hidden">-200</text>
-    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-200" gadfly:scale="1.0" visibility="hidden">-100</text>
-    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-201" gadfly:scale="1.0" visibility="visible">0</text>
-    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-202" gadfly:scale="1.0" visibility="visible">100</text>
-    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-203" gadfly:scale="1.0" visibility="visible">200</text>
-    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-204" gadfly:scale="1.0" visibility="visible">300</text>
-    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-205" gadfly:scale="1.0" visibility="visible">400</text>
-    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-206" gadfly:scale="1.0" visibility="visible">500</text>
-    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-207" gadfly:scale="1.0" visibility="visible">600</text>
-    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-208" gadfly:scale="1.0" visibility="hidden">700</text>
-    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-209" gadfly:scale="1.0" visibility="hidden">800</text>
-    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-210" gadfly:scale="1.0" visibility="hidden">900</text>
-    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-211" gadfly:scale="1.0" visibility="hidden">1000</text>
-    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-212" gadfly:scale="1.0" visibility="hidden">1100</text>
-    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-213" gadfly:scale="1.0" visibility="hidden">1200</text>
-    <text x="18.63" y="-76.67" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-214" gadfly:scale="1.0" visibility="hidden">1300</text>
-    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-215" gadfly:scale="10.0" visibility="hidden">-600</text>
-    <text x="18.63" y="148.04" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-216" gadfly:scale="10.0" visibility="hidden">-580</text>
-    <text x="18.63" y="145.65" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-217" gadfly:scale="10.0" visibility="hidden">-560</text>
-    <text x="18.63" y="143.26" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-218" gadfly:scale="10.0" visibility="hidden">-540</text>
-    <text x="18.63" y="140.87" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-219" gadfly:scale="10.0" visibility="hidden">-520</text>
-    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-220" gadfly:scale="10.0" visibility="hidden">-500</text>
-    <text x="18.63" y="136.09" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-221" gadfly:scale="10.0" visibility="hidden">-480</text>
-    <text x="18.63" y="133.7" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-222" gadfly:scale="10.0" visibility="hidden">-460</text>
-    <text x="18.63" y="131.31" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-223" gadfly:scale="10.0" visibility="hidden">-440</text>
-    <text x="18.63" y="128.92" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-224" gadfly:scale="10.0" visibility="hidden">-420</text>
-    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-225" gadfly:scale="10.0" visibility="hidden">-400</text>
-    <text x="18.63" y="124.13" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-226" gadfly:scale="10.0" visibility="hidden">-380</text>
-    <text x="18.63" y="121.74" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-227" gadfly:scale="10.0" visibility="hidden">-360</text>
-    <text x="18.63" y="119.35" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-228" gadfly:scale="10.0" visibility="hidden">-340</text>
-    <text x="18.63" y="116.96" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-229" gadfly:scale="10.0" visibility="hidden">-320</text>
-    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-230" gadfly:scale="10.0" visibility="hidden">-300</text>
-    <text x="18.63" y="112.18" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-231" gadfly:scale="10.0" visibility="hidden">-280</text>
-    <text x="18.63" y="109.79" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-232" gadfly:scale="10.0" visibility="hidden">-260</text>
-    <text x="18.63" y="107.4" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-233" gadfly:scale="10.0" visibility="hidden">-240</text>
-    <text x="18.63" y="105.01" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-234" gadfly:scale="10.0" visibility="hidden">-220</text>
-    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-235" gadfly:scale="10.0" visibility="hidden">-200</text>
-    <text x="18.63" y="100.23" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-236" gadfly:scale="10.0" visibility="hidden">-180</text>
-    <text x="18.63" y="97.84" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-237" gadfly:scale="10.0" visibility="hidden">-160</text>
-    <text x="18.63" y="95.45" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-238" gadfly:scale="10.0" visibility="hidden">-140</text>
-    <text x="18.63" y="93.06" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-239" gadfly:scale="10.0" visibility="hidden">-120</text>
-    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-240" gadfly:scale="10.0" visibility="hidden">-100</text>
-    <text x="18.63" y="88.28" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-241" gadfly:scale="10.0" visibility="hidden">-80</text>
-    <text x="18.63" y="85.89" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-242" gadfly:scale="10.0" visibility="hidden">-60</text>
-    <text x="18.63" y="83.5" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-243" gadfly:scale="10.0" visibility="hidden">-40</text>
-    <text x="18.63" y="81.11" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-244" gadfly:scale="10.0" visibility="hidden">-20</text>
-    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-245" gadfly:scale="10.0" visibility="hidden">0</text>
-    <text x="18.63" y="76.32" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-246" gadfly:scale="10.0" visibility="hidden">20</text>
-    <text x="18.63" y="73.93" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-247" gadfly:scale="10.0" visibility="hidden">40</text>
-    <text x="18.63" y="71.54" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-248" gadfly:scale="10.0" visibility="hidden">60</text>
-    <text x="18.63" y="69.15" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-249" gadfly:scale="10.0" visibility="hidden">80</text>
-    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-250" gadfly:scale="10.0" visibility="hidden">100</text>
-    <text x="18.63" y="64.37" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-251" gadfly:scale="10.0" visibility="hidden">120</text>
-    <text x="18.63" y="61.98" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-252" gadfly:scale="10.0" visibility="hidden">140</text>
-    <text x="18.63" y="59.59" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-253" gadfly:scale="10.0" visibility="hidden">160</text>
-    <text x="18.63" y="57.2" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-254" gadfly:scale="10.0" visibility="hidden">180</text>
-    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-255" gadfly:scale="10.0" visibility="hidden">200</text>
-    <text x="18.63" y="52.42" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-256" gadfly:scale="10.0" visibility="hidden">220</text>
-    <text x="18.63" y="50.03" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-257" gadfly:scale="10.0" visibility="hidden">240</text>
-    <text x="18.63" y="47.64" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-258" gadfly:scale="10.0" visibility="hidden">260</text>
-    <text x="18.63" y="45.25" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-259" gadfly:scale="10.0" visibility="hidden">280</text>
-    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-260" gadfly:scale="10.0" visibility="hidden">300</text>
-    <text x="18.63" y="40.47" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-261" gadfly:scale="10.0" visibility="hidden">320</text>
-    <text x="18.63" y="38.08" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-262" gadfly:scale="10.0" visibility="hidden">340</text>
-    <text x="18.63" y="35.69" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-263" gadfly:scale="10.0" visibility="hidden">360</text>
-    <text x="18.63" y="33.3" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-264" gadfly:scale="10.0" visibility="hidden">380</text>
-    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-265" gadfly:scale="10.0" visibility="hidden">400</text>
-    <text x="18.63" y="28.51" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-266" gadfly:scale="10.0" visibility="hidden">420</text>
-    <text x="18.63" y="26.12" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-267" gadfly:scale="10.0" visibility="hidden">440</text>
-    <text x="18.63" y="23.73" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-268" gadfly:scale="10.0" visibility="hidden">460</text>
-    <text x="18.63" y="21.34" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-269" gadfly:scale="10.0" visibility="hidden">480</text>
-    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-270" gadfly:scale="10.0" visibility="hidden">500</text>
-    <text x="18.63" y="16.56" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-271" gadfly:scale="10.0" visibility="hidden">520</text>
-    <text x="18.63" y="14.17" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-272" gadfly:scale="10.0" visibility="hidden">540</text>
-    <text x="18.63" y="11.78" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-273" gadfly:scale="10.0" visibility="hidden">560</text>
-    <text x="18.63" y="9.39" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-274" gadfly:scale="10.0" visibility="hidden">580</text>
-    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-275" gadfly:scale="10.0" visibility="hidden">600</text>
-    <text x="18.63" y="4.61" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-276" gadfly:scale="10.0" visibility="hidden">620</text>
-    <text x="18.63" y="2.22" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-277" gadfly:scale="10.0" visibility="hidden">640</text>
-    <text x="18.63" y="-0.17" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-278" gadfly:scale="10.0" visibility="hidden">660</text>
-    <text x="18.63" y="-2.56" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-279" gadfly:scale="10.0" visibility="hidden">680</text>
-    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-280" gadfly:scale="10.0" visibility="hidden">700</text>
-    <text x="18.63" y="-7.34" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-281" gadfly:scale="10.0" visibility="hidden">720</text>
-    <text x="18.63" y="-9.73" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-282" gadfly:scale="10.0" visibility="hidden">740</text>
-    <text x="18.63" y="-12.12" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-283" gadfly:scale="10.0" visibility="hidden">760</text>
-    <text x="18.63" y="-14.51" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-284" gadfly:scale="10.0" visibility="hidden">780</text>
-    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-285" gadfly:scale="10.0" visibility="hidden">800</text>
-    <text x="18.63" y="-19.3" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-286" gadfly:scale="10.0" visibility="hidden">820</text>
-    <text x="18.63" y="-21.69" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-287" gadfly:scale="10.0" visibility="hidden">840</text>
-    <text x="18.63" y="-24.08" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-288" gadfly:scale="10.0" visibility="hidden">860</text>
-    <text x="18.63" y="-26.47" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-289" gadfly:scale="10.0" visibility="hidden">880</text>
-    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-290" gadfly:scale="10.0" visibility="hidden">900</text>
-    <text x="18.63" y="-31.25" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-291" gadfly:scale="10.0" visibility="hidden">920</text>
-    <text x="18.63" y="-33.64" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-292" gadfly:scale="10.0" visibility="hidden">940</text>
-    <text x="18.63" y="-36.03" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-293" gadfly:scale="10.0" visibility="hidden">960</text>
-    <text x="18.63" y="-38.42" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-294" gadfly:scale="10.0" visibility="hidden">980</text>
-    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-295" gadfly:scale="10.0" visibility="hidden">1000</text>
-    <text x="18.63" y="-43.2" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-296" gadfly:scale="10.0" visibility="hidden">1020</text>
-    <text x="18.63" y="-45.59" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-297" gadfly:scale="10.0" visibility="hidden">1040</text>
-    <text x="18.63" y="-47.98" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-298" gadfly:scale="10.0" visibility="hidden">1060</text>
-    <text x="18.63" y="-50.37" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-299" gadfly:scale="10.0" visibility="hidden">1080</text>
-    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-300" gadfly:scale="10.0" visibility="hidden">1100</text>
-    <text x="18.63" y="-55.15" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-301" gadfly:scale="10.0" visibility="hidden">1120</text>
-    <text x="18.63" y="-57.54" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-302" gadfly:scale="10.0" visibility="hidden">1140</text>
-    <text x="18.63" y="-59.93" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-303" gadfly:scale="10.0" visibility="hidden">1160</text>
-    <text x="18.63" y="-62.32" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-304" gadfly:scale="10.0" visibility="hidden">1180</text>
-    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-305" gadfly:scale="10.0" visibility="hidden">1200</text>
-    <text x="18.63" y="198.24" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-306" gadfly:scale="0.5" visibility="hidden">-1000</text>
-    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-307" gadfly:scale="0.5" visibility="hidden">0</text>
-    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-308" gadfly:scale="0.5" visibility="hidden">1000</text>
-    <text x="18.63" y="-160.33" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-309" gadfly:scale="0.5" visibility="hidden">2000</text>
-    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-310" gadfly:scale="5.0" visibility="hidden">-600</text>
-    <text x="18.63" y="144.45" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-311" gadfly:scale="5.0" visibility="hidden">-550</text>
-    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-312" gadfly:scale="5.0" visibility="hidden">-500</text>
-    <text x="18.63" y="132.5" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-313" gadfly:scale="5.0" visibility="hidden">-450</text>
-    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-314" gadfly:scale="5.0" visibility="hidden">-400</text>
-    <text x="18.63" y="120.55" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-315" gadfly:scale="5.0" visibility="hidden">-350</text>
-    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-316" gadfly:scale="5.0" visibility="hidden">-300</text>
-    <text x="18.63" y="108.6" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-317" gadfly:scale="5.0" visibility="hidden">-250</text>
-    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-318" gadfly:scale="5.0" visibility="hidden">-200</text>
-    <text x="18.63" y="96.64" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-319" gadfly:scale="5.0" visibility="hidden">-150</text>
-    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-320" gadfly:scale="5.0" visibility="hidden">-100</text>
-    <text x="18.63" y="84.69" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-321" gadfly:scale="5.0" visibility="hidden">-50</text>
-    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-322" gadfly:scale="5.0" visibility="hidden">0</text>
-    <text x="18.63" y="72.74" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-323" gadfly:scale="5.0" visibility="hidden">50</text>
-    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-324" gadfly:scale="5.0" visibility="hidden">100</text>
-    <text x="18.63" y="60.79" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-325" gadfly:scale="5.0" visibility="hidden">150</text>
-    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-326" gadfly:scale="5.0" visibility="hidden">200</text>
-    <text x="18.63" y="48.83" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-327" gadfly:scale="5.0" visibility="hidden">250</text>
-    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-328" gadfly:scale="5.0" visibility="hidden">300</text>
-    <text x="18.63" y="36.88" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-329" gadfly:scale="5.0" visibility="hidden">350</text>
-    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-330" gadfly:scale="5.0" visibility="hidden">400</text>
-    <text x="18.63" y="24.93" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-331" gadfly:scale="5.0" visibility="hidden">450</text>
-    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-332" gadfly:scale="5.0" visibility="hidden">500</text>
-    <text x="18.63" y="12.98" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-333" gadfly:scale="5.0" visibility="hidden">550</text>
-    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-334" gadfly:scale="5.0" visibility="hidden">600</text>
-    <text x="18.63" y="1.02" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-335" gadfly:scale="5.0" visibility="hidden">650</text>
-    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-336" gadfly:scale="5.0" visibility="hidden">700</text>
-    <text x="18.63" y="-10.93" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-337" gadfly:scale="5.0" visibility="hidden">750</text>
-    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-338" gadfly:scale="5.0" visibility="hidden">800</text>
-    <text x="18.63" y="-22.88" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-339" gadfly:scale="5.0" visibility="hidden">850</text>
-    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-340" gadfly:scale="5.0" visibility="hidden">900</text>
-    <text x="18.63" y="-34.83" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-341" gadfly:scale="5.0" visibility="hidden">950</text>
-    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-342" gadfly:scale="5.0" visibility="hidden">1000</text>
-    <text x="18.63" y="-46.79" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-343" gadfly:scale="5.0" visibility="hidden">1050</text>
-    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-344" gadfly:scale="5.0" visibility="hidden">1100</text>
-    <text x="18.63" y="-58.74" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-345" gadfly:scale="5.0" visibility="hidden">1150</text>
-    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-346" gadfly:scale="5.0" visibility="hidden">1200</text>
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-193">
+    <text x="18.63" y="162.38" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-194" gadfly:scale="1.0" visibility="hidden">-700</text>
+    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-195" gadfly:scale="1.0" visibility="hidden">-600</text>
+    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-196" gadfly:scale="1.0" visibility="hidden">-500</text>
+    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-197" gadfly:scale="1.0" visibility="hidden">-400</text>
+    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-198" gadfly:scale="1.0" visibility="hidden">-300</text>
+    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-199" gadfly:scale="1.0" visibility="hidden">-200</text>
+    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-200" gadfly:scale="1.0" visibility="hidden">-100</text>
+    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-201" gadfly:scale="1.0" visibility="visible">0</text>
+    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-202" gadfly:scale="1.0" visibility="visible">100</text>
+    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-203" gadfly:scale="1.0" visibility="visible">200</text>
+    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-204" gadfly:scale="1.0" visibility="visible">300</text>
+    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-205" gadfly:scale="1.0" visibility="visible">400</text>
+    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-206" gadfly:scale="1.0" visibility="visible">500</text>
+    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-207" gadfly:scale="1.0" visibility="visible">600</text>
+    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-208" gadfly:scale="1.0" visibility="hidden">700</text>
+    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-209" gadfly:scale="1.0" visibility="hidden">800</text>
+    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-210" gadfly:scale="1.0" visibility="hidden">900</text>
+    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-211" gadfly:scale="1.0" visibility="hidden">1000</text>
+    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-212" gadfly:scale="1.0" visibility="hidden">1100</text>
+    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-213" gadfly:scale="1.0" visibility="hidden">1200</text>
+    <text x="18.63" y="-76.67" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-214" gadfly:scale="1.0" visibility="hidden">1300</text>
+    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-215" gadfly:scale="10.0" visibility="hidden">-600</text>
+    <text x="18.63" y="148.04" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-216" gadfly:scale="10.0" visibility="hidden">-580</text>
+    <text x="18.63" y="145.65" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-217" gadfly:scale="10.0" visibility="hidden">-560</text>
+    <text x="18.63" y="143.26" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-218" gadfly:scale="10.0" visibility="hidden">-540</text>
+    <text x="18.63" y="140.87" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-219" gadfly:scale="10.0" visibility="hidden">-520</text>
+    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-220" gadfly:scale="10.0" visibility="hidden">-500</text>
+    <text x="18.63" y="136.09" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-221" gadfly:scale="10.0" visibility="hidden">-480</text>
+    <text x="18.63" y="133.7" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-222" gadfly:scale="10.0" visibility="hidden">-460</text>
+    <text x="18.63" y="131.31" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-223" gadfly:scale="10.0" visibility="hidden">-440</text>
+    <text x="18.63" y="128.92" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-224" gadfly:scale="10.0" visibility="hidden">-420</text>
+    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-225" gadfly:scale="10.0" visibility="hidden">-400</text>
+    <text x="18.63" y="124.13" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-226" gadfly:scale="10.0" visibility="hidden">-380</text>
+    <text x="18.63" y="121.74" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-227" gadfly:scale="10.0" visibility="hidden">-360</text>
+    <text x="18.63" y="119.35" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-228" gadfly:scale="10.0" visibility="hidden">-340</text>
+    <text x="18.63" y="116.96" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-229" gadfly:scale="10.0" visibility="hidden">-320</text>
+    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-230" gadfly:scale="10.0" visibility="hidden">-300</text>
+    <text x="18.63" y="112.18" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-231" gadfly:scale="10.0" visibility="hidden">-280</text>
+    <text x="18.63" y="109.79" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-232" gadfly:scale="10.0" visibility="hidden">-260</text>
+    <text x="18.63" y="107.4" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-233" gadfly:scale="10.0" visibility="hidden">-240</text>
+    <text x="18.63" y="105.01" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-234" gadfly:scale="10.0" visibility="hidden">-220</text>
+    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-235" gadfly:scale="10.0" visibility="hidden">-200</text>
+    <text x="18.63" y="100.23" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-236" gadfly:scale="10.0" visibility="hidden">-180</text>
+    <text x="18.63" y="97.84" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-237" gadfly:scale="10.0" visibility="hidden">-160</text>
+    <text x="18.63" y="95.45" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-238" gadfly:scale="10.0" visibility="hidden">-140</text>
+    <text x="18.63" y="93.06" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-239" gadfly:scale="10.0" visibility="hidden">-120</text>
+    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-240" gadfly:scale="10.0" visibility="hidden">-100</text>
+    <text x="18.63" y="88.28" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-241" gadfly:scale="10.0" visibility="hidden">-80</text>
+    <text x="18.63" y="85.89" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-242" gadfly:scale="10.0" visibility="hidden">-60</text>
+    <text x="18.63" y="83.5" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-243" gadfly:scale="10.0" visibility="hidden">-40</text>
+    <text x="18.63" y="81.11" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-244" gadfly:scale="10.0" visibility="hidden">-20</text>
+    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-245" gadfly:scale="10.0" visibility="hidden">0</text>
+    <text x="18.63" y="76.32" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-246" gadfly:scale="10.0" visibility="hidden">20</text>
+    <text x="18.63" y="73.93" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-247" gadfly:scale="10.0" visibility="hidden">40</text>
+    <text x="18.63" y="71.54" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-248" gadfly:scale="10.0" visibility="hidden">60</text>
+    <text x="18.63" y="69.15" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-249" gadfly:scale="10.0" visibility="hidden">80</text>
+    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-250" gadfly:scale="10.0" visibility="hidden">100</text>
+    <text x="18.63" y="64.37" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-251" gadfly:scale="10.0" visibility="hidden">120</text>
+    <text x="18.63" y="61.98" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-252" gadfly:scale="10.0" visibility="hidden">140</text>
+    <text x="18.63" y="59.59" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-253" gadfly:scale="10.0" visibility="hidden">160</text>
+    <text x="18.63" y="57.2" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-254" gadfly:scale="10.0" visibility="hidden">180</text>
+    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-255" gadfly:scale="10.0" visibility="hidden">200</text>
+    <text x="18.63" y="52.42" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-256" gadfly:scale="10.0" visibility="hidden">220</text>
+    <text x="18.63" y="50.03" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-257" gadfly:scale="10.0" visibility="hidden">240</text>
+    <text x="18.63" y="47.64" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-258" gadfly:scale="10.0" visibility="hidden">260</text>
+    <text x="18.63" y="45.25" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-259" gadfly:scale="10.0" visibility="hidden">280</text>
+    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-260" gadfly:scale="10.0" visibility="hidden">300</text>
+    <text x="18.63" y="40.47" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-261" gadfly:scale="10.0" visibility="hidden">320</text>
+    <text x="18.63" y="38.08" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-262" gadfly:scale="10.0" visibility="hidden">340</text>
+    <text x="18.63" y="35.69" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-263" gadfly:scale="10.0" visibility="hidden">360</text>
+    <text x="18.63" y="33.3" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-264" gadfly:scale="10.0" visibility="hidden">380</text>
+    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-265" gadfly:scale="10.0" visibility="hidden">400</text>
+    <text x="18.63" y="28.51" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-266" gadfly:scale="10.0" visibility="hidden">420</text>
+    <text x="18.63" y="26.12" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-267" gadfly:scale="10.0" visibility="hidden">440</text>
+    <text x="18.63" y="23.73" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-268" gadfly:scale="10.0" visibility="hidden">460</text>
+    <text x="18.63" y="21.34" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-269" gadfly:scale="10.0" visibility="hidden">480</text>
+    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-270" gadfly:scale="10.0" visibility="hidden">500</text>
+    <text x="18.63" y="16.56" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-271" gadfly:scale="10.0" visibility="hidden">520</text>
+    <text x="18.63" y="14.17" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-272" gadfly:scale="10.0" visibility="hidden">540</text>
+    <text x="18.63" y="11.78" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-273" gadfly:scale="10.0" visibility="hidden">560</text>
+    <text x="18.63" y="9.39" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-274" gadfly:scale="10.0" visibility="hidden">580</text>
+    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-275" gadfly:scale="10.0" visibility="hidden">600</text>
+    <text x="18.63" y="4.61" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-276" gadfly:scale="10.0" visibility="hidden">620</text>
+    <text x="18.63" y="2.22" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-277" gadfly:scale="10.0" visibility="hidden">640</text>
+    <text x="18.63" y="-0.17" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-278" gadfly:scale="10.0" visibility="hidden">660</text>
+    <text x="18.63" y="-2.56" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-279" gadfly:scale="10.0" visibility="hidden">680</text>
+    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-280" gadfly:scale="10.0" visibility="hidden">700</text>
+    <text x="18.63" y="-7.34" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-281" gadfly:scale="10.0" visibility="hidden">720</text>
+    <text x="18.63" y="-9.73" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-282" gadfly:scale="10.0" visibility="hidden">740</text>
+    <text x="18.63" y="-12.12" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-283" gadfly:scale="10.0" visibility="hidden">760</text>
+    <text x="18.63" y="-14.51" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-284" gadfly:scale="10.0" visibility="hidden">780</text>
+    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-285" gadfly:scale="10.0" visibility="hidden">800</text>
+    <text x="18.63" y="-19.3" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-286" gadfly:scale="10.0" visibility="hidden">820</text>
+    <text x="18.63" y="-21.69" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-287" gadfly:scale="10.0" visibility="hidden">840</text>
+    <text x="18.63" y="-24.08" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-288" gadfly:scale="10.0" visibility="hidden">860</text>
+    <text x="18.63" y="-26.47" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-289" gadfly:scale="10.0" visibility="hidden">880</text>
+    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-290" gadfly:scale="10.0" visibility="hidden">900</text>
+    <text x="18.63" y="-31.25" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-291" gadfly:scale="10.0" visibility="hidden">920</text>
+    <text x="18.63" y="-33.64" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-292" gadfly:scale="10.0" visibility="hidden">940</text>
+    <text x="18.63" y="-36.03" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-293" gadfly:scale="10.0" visibility="hidden">960</text>
+    <text x="18.63" y="-38.42" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-294" gadfly:scale="10.0" visibility="hidden">980</text>
+    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-295" gadfly:scale="10.0" visibility="hidden">1000</text>
+    <text x="18.63" y="-43.2" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-296" gadfly:scale="10.0" visibility="hidden">1020</text>
+    <text x="18.63" y="-45.59" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-297" gadfly:scale="10.0" visibility="hidden">1040</text>
+    <text x="18.63" y="-47.98" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-298" gadfly:scale="10.0" visibility="hidden">1060</text>
+    <text x="18.63" y="-50.37" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-299" gadfly:scale="10.0" visibility="hidden">1080</text>
+    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-300" gadfly:scale="10.0" visibility="hidden">1100</text>
+    <text x="18.63" y="-55.15" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-301" gadfly:scale="10.0" visibility="hidden">1120</text>
+    <text x="18.63" y="-57.54" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-302" gadfly:scale="10.0" visibility="hidden">1140</text>
+    <text x="18.63" y="-59.93" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-303" gadfly:scale="10.0" visibility="hidden">1160</text>
+    <text x="18.63" y="-62.32" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-304" gadfly:scale="10.0" visibility="hidden">1180</text>
+    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-305" gadfly:scale="10.0" visibility="hidden">1200</text>
+    <text x="18.63" y="198.24" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-306" gadfly:scale="0.5" visibility="hidden">-1000</text>
+    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-307" gadfly:scale="0.5" visibility="hidden">0</text>
+    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-308" gadfly:scale="0.5" visibility="hidden">1000</text>
+    <text x="18.63" y="-160.33" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-309" gadfly:scale="0.5" visibility="hidden">2000</text>
+    <text x="18.63" y="150.43" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-310" gadfly:scale="5.0" visibility="hidden">-600</text>
+    <text x="18.63" y="144.45" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-311" gadfly:scale="5.0" visibility="hidden">-550</text>
+    <text x="18.63" y="138.48" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-312" gadfly:scale="5.0" visibility="hidden">-500</text>
+    <text x="18.63" y="132.5" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-313" gadfly:scale="5.0" visibility="hidden">-450</text>
+    <text x="18.63" y="126.52" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-314" gadfly:scale="5.0" visibility="hidden">-400</text>
+    <text x="18.63" y="120.55" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-315" gadfly:scale="5.0" visibility="hidden">-350</text>
+    <text x="18.63" y="114.57" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-316" gadfly:scale="5.0" visibility="hidden">-300</text>
+    <text x="18.63" y="108.6" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-317" gadfly:scale="5.0" visibility="hidden">-250</text>
+    <text x="18.63" y="102.62" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-318" gadfly:scale="5.0" visibility="hidden">-200</text>
+    <text x="18.63" y="96.64" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-319" gadfly:scale="5.0" visibility="hidden">-150</text>
+    <text x="18.63" y="90.67" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-320" gadfly:scale="5.0" visibility="hidden">-100</text>
+    <text x="18.63" y="84.69" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-321" gadfly:scale="5.0" visibility="hidden">-50</text>
+    <text x="18.63" y="78.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-322" gadfly:scale="5.0" visibility="hidden">0</text>
+    <text x="18.63" y="72.74" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-323" gadfly:scale="5.0" visibility="hidden">50</text>
+    <text x="18.63" y="66.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-324" gadfly:scale="5.0" visibility="hidden">100</text>
+    <text x="18.63" y="60.79" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-325" gadfly:scale="5.0" visibility="hidden">150</text>
+    <text x="18.63" y="54.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-326" gadfly:scale="5.0" visibility="hidden">200</text>
+    <text x="18.63" y="48.83" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-327" gadfly:scale="5.0" visibility="hidden">250</text>
+    <text x="18.63" y="42.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-328" gadfly:scale="5.0" visibility="hidden">300</text>
+    <text x="18.63" y="36.88" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-329" gadfly:scale="5.0" visibility="hidden">350</text>
+    <text x="18.63" y="30.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-330" gadfly:scale="5.0" visibility="hidden">400</text>
+    <text x="18.63" y="24.93" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-331" gadfly:scale="5.0" visibility="hidden">450</text>
+    <text x="18.63" y="18.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-332" gadfly:scale="5.0" visibility="hidden">500</text>
+    <text x="18.63" y="12.98" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-333" gadfly:scale="5.0" visibility="hidden">550</text>
+    <text x="18.63" y="7" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-334" gadfly:scale="5.0" visibility="hidden">600</text>
+    <text x="18.63" y="1.02" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-335" gadfly:scale="5.0" visibility="hidden">650</text>
+    <text x="18.63" y="-4.95" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-336" gadfly:scale="5.0" visibility="hidden">700</text>
+    <text x="18.63" y="-10.93" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-337" gadfly:scale="5.0" visibility="hidden">750</text>
+    <text x="18.63" y="-16.9" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-338" gadfly:scale="5.0" visibility="hidden">800</text>
+    <text x="18.63" y="-22.88" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-339" gadfly:scale="5.0" visibility="hidden">850</text>
+    <text x="18.63" y="-28.86" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-340" gadfly:scale="5.0" visibility="hidden">900</text>
+    <text x="18.63" y="-34.83" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-341" gadfly:scale="5.0" visibility="hidden">950</text>
+    <text x="18.63" y="-40.81" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-342" gadfly:scale="5.0" visibility="hidden">1000</text>
+    <text x="18.63" y="-46.79" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-343" gadfly:scale="5.0" visibility="hidden">1050</text>
+    <text x="18.63" y="-52.76" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-344" gadfly:scale="5.0" visibility="hidden">1100</text>
+    <text x="18.63" y="-58.74" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-345" gadfly:scale="5.0" visibility="hidden">1150</text>
+    <text x="18.63" y="-64.71" text-anchor="end" dy="0.35em" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-346" gadfly:scale="5.0" visibility="hidden">1200</text>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-347">
-    <text x="8.81" y="40.86" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 42.86)" id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-348">Survived</text>
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-347">
+    <text x="8.81" y="40.86" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 42.86)" id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-348">Survived</text>
   </g>
 </g>
 <defs>
-<clipPath id="fig-ef53c9e148bf4bc5b19af8e81d13087f-element-14">
+<clipPath id="fig-6f2c425000ec489abdba89ac4c88f8f7-element-14">
   <path d="M19.63,5 L 122.11 5 122.11 80.72 19.63 80.72" />
 </clipPath
 ></defs>
@@ -1694,26 +1605,26 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-ef53c9e148bf4bc5b19af8e81d13087f");
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-4")
+    var fig = Snap("#fig-6f2c425000ec489abdba89ac4c88f8f7");
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-4")
    .drag(function() {}, function() {}, function() {});
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-6")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-6")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-7")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-7")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-9")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-9")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-10")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-10")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-13")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-13")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -1721,63 +1632,63 @@ fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-13")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-17")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-17")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-17")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-17")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-171")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-171")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-171")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-171")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-181")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-181")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-181")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-181")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-181")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-181")
    .click(Gadfly.zoomslider_zoomin_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-185")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-185")
    .data("max_pos", 106.11)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-185")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-185")
    .data("min_pos", 89.11)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-185")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-185")
    .click(Gadfly.zoomslider_track_click);
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-187")
    .data("max_pos", 106.11)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-187")
    .data("min_pos", 89.11)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-187")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-187")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-187")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-187")
    .drag(Gadfly.zoomslider_thumb_dragmove,
      Gadfly.zoomslider_thumb_dragstart,
      Gadfly.zoomslider_thumb_dragend)
 .mousedown(Gadfly.zoomslider_thumb_mousedown)
 .mouseup(Gadfly.zoomslider_thumb_mouseup)
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-189")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-189")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-189")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-189")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-189")
+fig.select("#fig-6f2c425000ec489abdba89ac4c88f8f7-element-189")
    .click(Gadfly.zoomslider_zoomout_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
@@ -1792,17 +1703,7 @@ fig.select("#fig-ef53c9e148bf4bc5b19af8e81d13087f-element-189")
 Its pretty clear that more females survived over males.  
 So lets predict Survived=1 if Sex=female else Survived=0. With that you have your first predictive model ready!!
 
-
-    test[:Survived] = 0
-    test[test[:Sex] .== "female", :Survived] = 1
-    head(test)
-
-
-
-
-<table class="data-frame"><tr><th></th><th>PassengerId</th><th>Pclass</th><th>Name</th><th>Sex</th><th>Age</th><th>SibSp</th><th>Parch</th><th>Ticket</th><th>Fare</th><th>Cabin</th><th>Embarked</th><th>Survived</th></tr><tr><th>1</th><td>892</td><td>3</td><td>Kelly, Mr. James</td><td>male</td><td>34.5</td><td>0</td><td>0</td><td>330911</td><td>7.8292</td><td>NA</td><td>Q</td><td>0</td></tr><tr><th>2</th><td>893</td><td>3</td><td>Wilkes, Mrs. James (Ellen Needs)</td><td>female</td><td>47.0</td><td>1</td><td>0</td><td>363272</td><td>7.0</td><td>NA</td><td>S</td><td>1</td></tr><tr><th>3</th><td>894</td><td>2</td><td>Myles, Mr. Thomas Francis</td><td>male</td><td>62.0</td><td>0</td><td>0</td><td>240276</td><td>9.6875</td><td>NA</td><td>Q</td><td>0</td></tr><tr><th>4</th><td>895</td><td>3</td><td>Wirz, Mr. Albert</td><td>male</td><td>27.0</td><td>0</td><td>0</td><td>315154</td><td>8.6625</td><td>NA</td><td>S</td><td>0</td></tr><tr><th>5</th><td>896</td><td>3</td><td>Hirvonen, Mrs. Alexander (Helga E Lindqvist)</td><td>female</td><td>22.0</td><td>1</td><td>1</td><td>3101298</td><td>12.2875</td><td>NA</td><td>S</td><td>1</td></tr><tr><th>6</th><td>897</td><td>3</td><td>Svensson, Mr. Johan Cervin</td><td>male</td><td>14.0</td><td>0</td><td>0</td><td>7538</td><td>9.225</td><td>NA</td><td>S</td><td>0</td></tr></table>
-
-
+But lets not stop there, we have lot more dimensions to the data. Lets see if we can make use of those to enhance the model. We have Age as one of the columns, using which we can create another dimension to the data - a variable indicating whether the person was a child or not.
 
 
     train[:Child] = 1
@@ -1817,6 +1718,8 @@ So lets predict Survived=1 if Sex=female else Survived=0. With that you have you
 <table class="data-frame"><tr><th></th><th>PassengerId</th><th>Survived</th><th>Pclass</th><th>Name</th><th>Sex</th><th>Age</th><th>SibSp</th><th>Parch</th><th>Ticket</th><th>Fare</th><th>Cabin</th><th>Embarked</th><th>Child</th></tr><tr><th>1</th><td>1</td><td>0</td><td>3</td><td>Braund, Mr. Owen Harris</td><td>male</td><td>22.0</td><td>1</td><td>0</td><td>A/5 21171</td><td>7.25</td><td>NA</td><td>S</td><td>0</td></tr><tr><th>2</th><td>2</td><td>1</td><td>1</td><td>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</td><td>female</td><td>38.0</td><td>1</td><td>0</td><td>PC 17599</td><td>71.2833</td><td>C85</td><td>C</td><td>0</td></tr><tr><th>3</th><td>3</td><td>1</td><td>3</td><td>Heikkinen, Miss. Laina</td><td>female</td><td>26.0</td><td>0</td><td>0</td><td>STON/O2. 3101282</td><td>7.925</td><td>NA</td><td>S</td><td>0</td></tr><tr><th>4</th><td>4</td><td>1</td><td>1</td><td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td><td>female</td><td>35.0</td><td>1</td><td>0</td><td>113803</td><td>53.1</td><td>C123</td><td>S</td><td>0</td></tr><tr><th>5</th><td>5</td><td>0</td><td>3</td><td>Allen, Mr. William Henry</td><td>male</td><td>35.0</td><td>0</td><td>0</td><td>373450</td><td>8.05</td><td>NA</td><td>S</td><td>0</td></tr><tr><th>6</th><td>6</td><td>0</td><td>3</td><td>Moran, Mr. James</td><td>male</td><td>NA</td><td>0</td><td>0</td><td>330877</td><td>8.4583</td><td>NA</td><td>Q</td><td>1</td></tr></table>
 
 
+
+Not that we have our Child indicator variable, lets try to plot the survival rate of children on Titanic.
 
 
     plot(train, x="Child", y="Survived", color="Survived", Geom.histogram(position=:stack), Scale.color_discrete_manual("red","green"))
@@ -1835,12 +1738,12 @@ So lets predict Survived=1 if Sex=female else Survived=0. With that you have you
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-29ea3fd87140473598aca1082223ac51">
-<g class="plotroot xscalable yscalable" id="fig-29ea3fd87140473598aca1082223ac51-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-29ea3fd87140473598aca1082223ac51-element-2">
+     id="fig-38e72c145f844880aa1571231609cbdc">
+<g class="plotroot xscalable yscalable" id="fig-38e72c145f844880aa1571231609cbdc-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-38e72c145f844880aa1571231609cbdc-element-2">
     <text x="71.71" y="88.39" text-anchor="middle" dy="0.6em">Child</text>
   </g>
-  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-29ea3fd87140473598aca1082223ac51-element-3">
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-38e72c145f844880aa1571231609cbdc-element-3">
     <text x="-105.77" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-4</text>
     <text x="-73.5" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-3</text>
     <text x="-41.23" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-2</text>
@@ -1995,449 +1898,449 @@ So lets predict Survived=1 if Sex=female else Survived=0. With that you have you
     <text x="210.47" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">5.8</text>
     <text x="216.92" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">6.0</text>
   </g>
-  <g class="guide colorkey" id="fig-29ea3fd87140473598aca1082223ac51-element-4">
-    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-29ea3fd87140473598aca1082223ac51-element-5">
-      <text x="125.93" y="42.86" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-6" class="color_0">0</text>
-      <text x="125.93" y="46.48" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-7" class="color_1">1</text>
+  <g class="guide colorkey" id="fig-38e72c145f844880aa1571231609cbdc-element-4">
+    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-38e72c145f844880aa1571231609cbdc-element-5">
+      <text x="125.93" y="42.86" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-6" class="color_0">0</text>
+      <text x="125.93" y="46.48" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-7" class="color_1">1</text>
     </g>
-    <g stroke="#000000" stroke-opacity="0.000" id="fig-29ea3fd87140473598aca1082223ac51-element-8">
-      <rect x="123.11" y="41.95" width="1.81" height="1.81" id="fig-29ea3fd87140473598aca1082223ac51-element-9" class="color_0" fill="#FF0000"/>
-      <rect x="123.11" y="45.58" width="1.81" height="1.81" id="fig-29ea3fd87140473598aca1082223ac51-element-10" class="color_1" fill="#008000"/>
+    <g stroke="#000000" stroke-opacity="0.000" id="fig-38e72c145f844880aa1571231609cbdc-element-8">
+      <rect x="123.11" y="41.95" width="1.81" height="1.81" id="fig-38e72c145f844880aa1571231609cbdc-element-9" class="color_0" fill="#FF0000"/>
+      <rect x="123.11" y="45.58" width="1.81" height="1.81" id="fig-38e72c145f844880aa1571231609cbdc-element-10" class="color_1" fill="#008000"/>
     </g>
-    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-29ea3fd87140473598aca1082223ac51-element-11">
-      <text x="123.11" y="39.04" id="fig-29ea3fd87140473598aca1082223ac51-element-12">Survived</text>
+    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-38e72c145f844880aa1571231609cbdc-element-11">
+      <text x="123.11" y="39.04" id="fig-38e72c145f844880aa1571231609cbdc-element-12">Survived</text>
     </g>
   </g>
-  <g clip-path="url(#fig-29ea3fd87140473598aca1082223ac51-element-14)" id="fig-29ea3fd87140473598aca1082223ac51-element-13">
-    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-29ea3fd87140473598aca1082223ac51-element-15">
-      <rect x="21.31" y="5" width="100.81" height="75.72" id="fig-29ea3fd87140473598aca1082223ac51-element-16"/>
+  <g clip-path="url(#fig-38e72c145f844880aa1571231609cbdc-element-14)" id="fig-38e72c145f844880aa1571231609cbdc-element-13">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-38e72c145f844880aa1571231609cbdc-element-15">
+      <rect x="21.31" y="5" width="100.81" height="75.72" id="fig-38e72c145f844880aa1571231609cbdc-element-16"/>
     </g>
-    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-29ea3fd87140473598aca1082223ac51-element-17">
-      <path fill="none" d="M21.31,164.77 L 122.11 164.77" id="fig-29ea3fd87140473598aca1082223ac51-element-18" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-29ea3fd87140473598aca1082223ac51-element-19" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-29ea3fd87140473598aca1082223ac51-element-20" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-29ea3fd87140473598aca1082223ac51-element-21" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-29ea3fd87140473598aca1082223ac51-element-22" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-29ea3fd87140473598aca1082223ac51-element-23" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-29ea3fd87140473598aca1082223ac51-element-24" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-29ea3fd87140473598aca1082223ac51-element-25" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-29ea3fd87140473598aca1082223ac51-element-26" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-29ea3fd87140473598aca1082223ac51-element-27" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-29ea3fd87140473598aca1082223ac51-element-28" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-29ea3fd87140473598aca1082223ac51-element-29" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-29ea3fd87140473598aca1082223ac51-element-30" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-29ea3fd87140473598aca1082223ac51-element-31" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-29ea3fd87140473598aca1082223ac51-element-32" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-29ea3fd87140473598aca1082223ac51-element-33" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-29ea3fd87140473598aca1082223ac51-element-34" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-79.06 L 122.11 -79.06" id="fig-29ea3fd87140473598aca1082223ac51-element-35" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-29ea3fd87140473598aca1082223ac51-element-36" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,146.84 L 122.11 146.84" id="fig-29ea3fd87140473598aca1082223ac51-element-37" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,143.26 L 122.11 143.26" id="fig-29ea3fd87140473598aca1082223ac51-element-38" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,139.67 L 122.11 139.67" id="fig-29ea3fd87140473598aca1082223ac51-element-39" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-29ea3fd87140473598aca1082223ac51-element-40" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,132.5 L 122.11 132.5" id="fig-29ea3fd87140473598aca1082223ac51-element-41" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,128.92 L 122.11 128.92" id="fig-29ea3fd87140473598aca1082223ac51-element-42" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,125.33 L 122.11 125.33" id="fig-29ea3fd87140473598aca1082223ac51-element-43" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-29ea3fd87140473598aca1082223ac51-element-44" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,118.16 L 122.11 118.16" id="fig-29ea3fd87140473598aca1082223ac51-element-45" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,114.57 L 122.11 114.57" id="fig-29ea3fd87140473598aca1082223ac51-element-46" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,110.99 L 122.11 110.99" id="fig-29ea3fd87140473598aca1082223ac51-element-47" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-29ea3fd87140473598aca1082223ac51-element-48" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,103.82 L 122.11 103.82" id="fig-29ea3fd87140473598aca1082223ac51-element-49" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,100.23 L 122.11 100.23" id="fig-29ea3fd87140473598aca1082223ac51-element-50" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,96.64 L 122.11 96.64" id="fig-29ea3fd87140473598aca1082223ac51-element-51" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-29ea3fd87140473598aca1082223ac51-element-52" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,89.47 L 122.11 89.47" id="fig-29ea3fd87140473598aca1082223ac51-element-53" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,85.89 L 122.11 85.89" id="fig-29ea3fd87140473598aca1082223ac51-element-54" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,82.3 L 122.11 82.3" id="fig-29ea3fd87140473598aca1082223ac51-element-55" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-29ea3fd87140473598aca1082223ac51-element-56" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,75.13 L 122.11 75.13" id="fig-29ea3fd87140473598aca1082223ac51-element-57" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,71.54 L 122.11 71.54" id="fig-29ea3fd87140473598aca1082223ac51-element-58" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,67.96 L 122.11 67.96" id="fig-29ea3fd87140473598aca1082223ac51-element-59" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-29ea3fd87140473598aca1082223ac51-element-60" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,60.79 L 122.11 60.79" id="fig-29ea3fd87140473598aca1082223ac51-element-61" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,57.2 L 122.11 57.2" id="fig-29ea3fd87140473598aca1082223ac51-element-62" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,53.61 L 122.11 53.61" id="fig-29ea3fd87140473598aca1082223ac51-element-63" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-29ea3fd87140473598aca1082223ac51-element-64" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,46.44 L 122.11 46.44" id="fig-29ea3fd87140473598aca1082223ac51-element-65" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,42.86 L 122.11 42.86" id="fig-29ea3fd87140473598aca1082223ac51-element-66" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,39.27 L 122.11 39.27" id="fig-29ea3fd87140473598aca1082223ac51-element-67" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-29ea3fd87140473598aca1082223ac51-element-68" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,32.1 L 122.11 32.1" id="fig-29ea3fd87140473598aca1082223ac51-element-69" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,28.51 L 122.11 28.51" id="fig-29ea3fd87140473598aca1082223ac51-element-70" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,24.93 L 122.11 24.93" id="fig-29ea3fd87140473598aca1082223ac51-element-71" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-29ea3fd87140473598aca1082223ac51-element-72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,17.76 L 122.11 17.76" id="fig-29ea3fd87140473598aca1082223ac51-element-73" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,14.17 L 122.11 14.17" id="fig-29ea3fd87140473598aca1082223ac51-element-74" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,10.59 L 122.11 10.59" id="fig-29ea3fd87140473598aca1082223ac51-element-75" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-29ea3fd87140473598aca1082223ac51-element-76" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,3.41 L 122.11 3.41" id="fig-29ea3fd87140473598aca1082223ac51-element-77" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-0.17 L 122.11 -0.17" id="fig-29ea3fd87140473598aca1082223ac51-element-78" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-3.76 L 122.11 -3.76" id="fig-29ea3fd87140473598aca1082223ac51-element-79" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-29ea3fd87140473598aca1082223ac51-element-80" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-10.93 L 122.11 -10.93" id="fig-29ea3fd87140473598aca1082223ac51-element-81" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-14.51 L 122.11 -14.51" id="fig-29ea3fd87140473598aca1082223ac51-element-82" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-18.1 L 122.11 -18.1" id="fig-29ea3fd87140473598aca1082223ac51-element-83" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-29ea3fd87140473598aca1082223ac51-element-84" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-25.27 L 122.11 -25.27" id="fig-29ea3fd87140473598aca1082223ac51-element-85" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-28.86 L 122.11 -28.86" id="fig-29ea3fd87140473598aca1082223ac51-element-86" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-32.44 L 122.11 -32.44" id="fig-29ea3fd87140473598aca1082223ac51-element-87" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-29ea3fd87140473598aca1082223ac51-element-88" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-39.61 L 122.11 -39.61" id="fig-29ea3fd87140473598aca1082223ac51-element-89" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-43.2 L 122.11 -43.2" id="fig-29ea3fd87140473598aca1082223ac51-element-90" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-46.79 L 122.11 -46.79" id="fig-29ea3fd87140473598aca1082223ac51-element-91" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-29ea3fd87140473598aca1082223ac51-element-92" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-53.96 L 122.11 -53.96" id="fig-29ea3fd87140473598aca1082223ac51-element-93" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-57.54 L 122.11 -57.54" id="fig-29ea3fd87140473598aca1082223ac51-element-94" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-61.13 L 122.11 -61.13" id="fig-29ea3fd87140473598aca1082223ac51-element-95" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-29ea3fd87140473598aca1082223ac51-element-96" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-29ea3fd87140473598aca1082223ac51-element-97" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-29ea3fd87140473598aca1082223ac51-element-98" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-29ea3fd87140473598aca1082223ac51-element-99" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-29ea3fd87140473598aca1082223ac51-element-100" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-29ea3fd87140473598aca1082223ac51-element-101" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,143.26 L 122.11 143.26" id="fig-29ea3fd87140473598aca1082223ac51-element-102" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-29ea3fd87140473598aca1082223ac51-element-103" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,128.92 L 122.11 128.92" id="fig-29ea3fd87140473598aca1082223ac51-element-104" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-29ea3fd87140473598aca1082223ac51-element-105" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,114.57 L 122.11 114.57" id="fig-29ea3fd87140473598aca1082223ac51-element-106" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-29ea3fd87140473598aca1082223ac51-element-107" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,100.23 L 122.11 100.23" id="fig-29ea3fd87140473598aca1082223ac51-element-108" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-29ea3fd87140473598aca1082223ac51-element-109" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,85.89 L 122.11 85.89" id="fig-29ea3fd87140473598aca1082223ac51-element-110" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-29ea3fd87140473598aca1082223ac51-element-111" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,71.54 L 122.11 71.54" id="fig-29ea3fd87140473598aca1082223ac51-element-112" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-29ea3fd87140473598aca1082223ac51-element-113" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,57.2 L 122.11 57.2" id="fig-29ea3fd87140473598aca1082223ac51-element-114" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-29ea3fd87140473598aca1082223ac51-element-115" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,42.86 L 122.11 42.86" id="fig-29ea3fd87140473598aca1082223ac51-element-116" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-29ea3fd87140473598aca1082223ac51-element-117" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,28.51 L 122.11 28.51" id="fig-29ea3fd87140473598aca1082223ac51-element-118" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-29ea3fd87140473598aca1082223ac51-element-119" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,14.17 L 122.11 14.17" id="fig-29ea3fd87140473598aca1082223ac51-element-120" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-29ea3fd87140473598aca1082223ac51-element-121" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-0.17 L 122.11 -0.17" id="fig-29ea3fd87140473598aca1082223ac51-element-122" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-29ea3fd87140473598aca1082223ac51-element-123" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-14.51 L 122.11 -14.51" id="fig-29ea3fd87140473598aca1082223ac51-element-124" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-29ea3fd87140473598aca1082223ac51-element-125" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-28.86 L 122.11 -28.86" id="fig-29ea3fd87140473598aca1082223ac51-element-126" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-29ea3fd87140473598aca1082223ac51-element-127" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-43.2 L 122.11 -43.2" id="fig-29ea3fd87140473598aca1082223ac51-element-128" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-29ea3fd87140473598aca1082223ac51-element-129" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-57.54 L 122.11 -57.54" id="fig-29ea3fd87140473598aca1082223ac51-element-130" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-29ea3fd87140473598aca1082223ac51-element-131" gadfly:scale="5.0" visibility="hidden"/>
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-38e72c145f844880aa1571231609cbdc-element-17">
+      <path fill="none" d="M21.31,164.77 L 122.11 164.77" id="fig-38e72c145f844880aa1571231609cbdc-element-18" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-38e72c145f844880aa1571231609cbdc-element-19" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-38e72c145f844880aa1571231609cbdc-element-20" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-38e72c145f844880aa1571231609cbdc-element-21" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-38e72c145f844880aa1571231609cbdc-element-22" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-38e72c145f844880aa1571231609cbdc-element-23" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-38e72c145f844880aa1571231609cbdc-element-24" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-38e72c145f844880aa1571231609cbdc-element-25" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-38e72c145f844880aa1571231609cbdc-element-26" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-38e72c145f844880aa1571231609cbdc-element-27" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-38e72c145f844880aa1571231609cbdc-element-28" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-38e72c145f844880aa1571231609cbdc-element-29" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-38e72c145f844880aa1571231609cbdc-element-30" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-38e72c145f844880aa1571231609cbdc-element-31" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-38e72c145f844880aa1571231609cbdc-element-32" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-38e72c145f844880aa1571231609cbdc-element-33" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-38e72c145f844880aa1571231609cbdc-element-34" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-79.06 L 122.11 -79.06" id="fig-38e72c145f844880aa1571231609cbdc-element-35" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-38e72c145f844880aa1571231609cbdc-element-36" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,146.84 L 122.11 146.84" id="fig-38e72c145f844880aa1571231609cbdc-element-37" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,143.26 L 122.11 143.26" id="fig-38e72c145f844880aa1571231609cbdc-element-38" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,139.67 L 122.11 139.67" id="fig-38e72c145f844880aa1571231609cbdc-element-39" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-38e72c145f844880aa1571231609cbdc-element-40" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,132.5 L 122.11 132.5" id="fig-38e72c145f844880aa1571231609cbdc-element-41" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,128.92 L 122.11 128.92" id="fig-38e72c145f844880aa1571231609cbdc-element-42" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,125.33 L 122.11 125.33" id="fig-38e72c145f844880aa1571231609cbdc-element-43" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-38e72c145f844880aa1571231609cbdc-element-44" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,118.16 L 122.11 118.16" id="fig-38e72c145f844880aa1571231609cbdc-element-45" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,114.57 L 122.11 114.57" id="fig-38e72c145f844880aa1571231609cbdc-element-46" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,110.99 L 122.11 110.99" id="fig-38e72c145f844880aa1571231609cbdc-element-47" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-38e72c145f844880aa1571231609cbdc-element-48" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,103.82 L 122.11 103.82" id="fig-38e72c145f844880aa1571231609cbdc-element-49" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,100.23 L 122.11 100.23" id="fig-38e72c145f844880aa1571231609cbdc-element-50" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,96.64 L 122.11 96.64" id="fig-38e72c145f844880aa1571231609cbdc-element-51" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-38e72c145f844880aa1571231609cbdc-element-52" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,89.47 L 122.11 89.47" id="fig-38e72c145f844880aa1571231609cbdc-element-53" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,85.89 L 122.11 85.89" id="fig-38e72c145f844880aa1571231609cbdc-element-54" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,82.3 L 122.11 82.3" id="fig-38e72c145f844880aa1571231609cbdc-element-55" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-38e72c145f844880aa1571231609cbdc-element-56" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,75.13 L 122.11 75.13" id="fig-38e72c145f844880aa1571231609cbdc-element-57" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,71.54 L 122.11 71.54" id="fig-38e72c145f844880aa1571231609cbdc-element-58" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,67.96 L 122.11 67.96" id="fig-38e72c145f844880aa1571231609cbdc-element-59" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-38e72c145f844880aa1571231609cbdc-element-60" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,60.79 L 122.11 60.79" id="fig-38e72c145f844880aa1571231609cbdc-element-61" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,57.2 L 122.11 57.2" id="fig-38e72c145f844880aa1571231609cbdc-element-62" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,53.61 L 122.11 53.61" id="fig-38e72c145f844880aa1571231609cbdc-element-63" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-38e72c145f844880aa1571231609cbdc-element-64" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,46.44 L 122.11 46.44" id="fig-38e72c145f844880aa1571231609cbdc-element-65" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,42.86 L 122.11 42.86" id="fig-38e72c145f844880aa1571231609cbdc-element-66" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,39.27 L 122.11 39.27" id="fig-38e72c145f844880aa1571231609cbdc-element-67" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-38e72c145f844880aa1571231609cbdc-element-68" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,32.1 L 122.11 32.1" id="fig-38e72c145f844880aa1571231609cbdc-element-69" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,28.51 L 122.11 28.51" id="fig-38e72c145f844880aa1571231609cbdc-element-70" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,24.93 L 122.11 24.93" id="fig-38e72c145f844880aa1571231609cbdc-element-71" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-38e72c145f844880aa1571231609cbdc-element-72" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,17.76 L 122.11 17.76" id="fig-38e72c145f844880aa1571231609cbdc-element-73" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,14.17 L 122.11 14.17" id="fig-38e72c145f844880aa1571231609cbdc-element-74" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,10.59 L 122.11 10.59" id="fig-38e72c145f844880aa1571231609cbdc-element-75" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-38e72c145f844880aa1571231609cbdc-element-76" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,3.41 L 122.11 3.41" id="fig-38e72c145f844880aa1571231609cbdc-element-77" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-0.17 L 122.11 -0.17" id="fig-38e72c145f844880aa1571231609cbdc-element-78" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-3.76 L 122.11 -3.76" id="fig-38e72c145f844880aa1571231609cbdc-element-79" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-38e72c145f844880aa1571231609cbdc-element-80" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-10.93 L 122.11 -10.93" id="fig-38e72c145f844880aa1571231609cbdc-element-81" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-14.51 L 122.11 -14.51" id="fig-38e72c145f844880aa1571231609cbdc-element-82" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-18.1 L 122.11 -18.1" id="fig-38e72c145f844880aa1571231609cbdc-element-83" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-38e72c145f844880aa1571231609cbdc-element-84" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-25.27 L 122.11 -25.27" id="fig-38e72c145f844880aa1571231609cbdc-element-85" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-28.86 L 122.11 -28.86" id="fig-38e72c145f844880aa1571231609cbdc-element-86" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-32.44 L 122.11 -32.44" id="fig-38e72c145f844880aa1571231609cbdc-element-87" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-38e72c145f844880aa1571231609cbdc-element-88" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-39.61 L 122.11 -39.61" id="fig-38e72c145f844880aa1571231609cbdc-element-89" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-43.2 L 122.11 -43.2" id="fig-38e72c145f844880aa1571231609cbdc-element-90" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-46.79 L 122.11 -46.79" id="fig-38e72c145f844880aa1571231609cbdc-element-91" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-38e72c145f844880aa1571231609cbdc-element-92" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-53.96 L 122.11 -53.96" id="fig-38e72c145f844880aa1571231609cbdc-element-93" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-57.54 L 122.11 -57.54" id="fig-38e72c145f844880aa1571231609cbdc-element-94" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-61.13 L 122.11 -61.13" id="fig-38e72c145f844880aa1571231609cbdc-element-95" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-38e72c145f844880aa1571231609cbdc-element-96" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-38e72c145f844880aa1571231609cbdc-element-97" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-38e72c145f844880aa1571231609cbdc-element-98" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-38e72c145f844880aa1571231609cbdc-element-99" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-38e72c145f844880aa1571231609cbdc-element-100" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M21.31,150.43 L 122.11 150.43" id="fig-38e72c145f844880aa1571231609cbdc-element-101" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,143.26 L 122.11 143.26" id="fig-38e72c145f844880aa1571231609cbdc-element-102" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,136.09 L 122.11 136.09" id="fig-38e72c145f844880aa1571231609cbdc-element-103" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,128.92 L 122.11 128.92" id="fig-38e72c145f844880aa1571231609cbdc-element-104" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,121.74 L 122.11 121.74" id="fig-38e72c145f844880aa1571231609cbdc-element-105" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,114.57 L 122.11 114.57" id="fig-38e72c145f844880aa1571231609cbdc-element-106" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,107.4 L 122.11 107.4" id="fig-38e72c145f844880aa1571231609cbdc-element-107" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,100.23 L 122.11 100.23" id="fig-38e72c145f844880aa1571231609cbdc-element-108" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,93.06 L 122.11 93.06" id="fig-38e72c145f844880aa1571231609cbdc-element-109" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,85.89 L 122.11 85.89" id="fig-38e72c145f844880aa1571231609cbdc-element-110" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,78.72 L 122.11 78.72" id="fig-38e72c145f844880aa1571231609cbdc-element-111" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,71.54 L 122.11 71.54" id="fig-38e72c145f844880aa1571231609cbdc-element-112" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,64.37 L 122.11 64.37" id="fig-38e72c145f844880aa1571231609cbdc-element-113" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,57.2 L 122.11 57.2" id="fig-38e72c145f844880aa1571231609cbdc-element-114" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,50.03 L 122.11 50.03" id="fig-38e72c145f844880aa1571231609cbdc-element-115" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,42.86 L 122.11 42.86" id="fig-38e72c145f844880aa1571231609cbdc-element-116" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,35.69 L 122.11 35.69" id="fig-38e72c145f844880aa1571231609cbdc-element-117" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,28.51 L 122.11 28.51" id="fig-38e72c145f844880aa1571231609cbdc-element-118" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,21.34 L 122.11 21.34" id="fig-38e72c145f844880aa1571231609cbdc-element-119" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,14.17 L 122.11 14.17" id="fig-38e72c145f844880aa1571231609cbdc-element-120" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,7 L 122.11 7" id="fig-38e72c145f844880aa1571231609cbdc-element-121" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-0.17 L 122.11 -0.17" id="fig-38e72c145f844880aa1571231609cbdc-element-122" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-7.34 L 122.11 -7.34" id="fig-38e72c145f844880aa1571231609cbdc-element-123" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-14.51 L 122.11 -14.51" id="fig-38e72c145f844880aa1571231609cbdc-element-124" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-21.69 L 122.11 -21.69" id="fig-38e72c145f844880aa1571231609cbdc-element-125" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-28.86 L 122.11 -28.86" id="fig-38e72c145f844880aa1571231609cbdc-element-126" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-36.03 L 122.11 -36.03" id="fig-38e72c145f844880aa1571231609cbdc-element-127" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-43.2 L 122.11 -43.2" id="fig-38e72c145f844880aa1571231609cbdc-element-128" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-50.37 L 122.11 -50.37" id="fig-38e72c145f844880aa1571231609cbdc-element-129" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-57.54 L 122.11 -57.54" id="fig-38e72c145f844880aa1571231609cbdc-element-130" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M21.31,-64.72 L 122.11 -64.72" id="fig-38e72c145f844880aa1571231609cbdc-element-131" gadfly:scale="5.0" visibility="hidden"/>
     </g>
-    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-29ea3fd87140473598aca1082223ac51-element-132">
-      <path fill="none" d="M-105.77,5 L -105.77 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-133" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-134" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-135" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-136" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-137" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-138" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-139" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-140" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-141" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-142" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-143" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M249.19,5 L 249.19 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-144" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-145" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-70.28,5 L -70.28 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-146" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-67.05,5 L -67.05 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-147" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-63.82,5 L -63.82 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-148" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-60.59,5 L -60.59 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-149" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-57.37,5 L -57.37 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-150" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-54.14,5 L -54.14 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-151" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-50.91,5 L -50.91 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-152" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-47.69,5 L -47.69 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-153" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-44.46,5 L -44.46 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-154" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-155" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-38.01,5 L -38.01 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-156" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-34.78,5 L -34.78 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-157" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-31.55,5 L -31.55 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-158" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-28.33,5 L -28.33 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-159" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-25.1,5 L -25.1 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-160" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-21.87,5 L -21.87 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-161" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-18.64,5 L -18.64 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-162" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-15.42,5 L -15.42 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-163" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-12.19,5 L -12.19 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-164" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-165" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-5.74,5 L -5.74 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-166" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-2.51,5 L -2.51 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-167" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M0.72,5 L 0.72 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-168" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M3.94,5 L 3.94 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-169" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M7.17,5 L 7.17 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-170" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M10.4,5 L 10.4 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-171" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M13.62,5 L 13.62 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-172" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M16.85,5 L 16.85 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-173" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M20.08,5 L 20.08 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-174" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-175" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M26.53,5 L 26.53 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-176" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M29.76,5 L 29.76 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-177" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M32.99,5 L 32.99 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-178" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M36.21,5 L 36.21 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-179" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M39.44,5 L 39.44 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-180" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M42.67,5 L 42.67 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-181" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M45.89,5 L 45.89 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-182" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M49.12,5 L 49.12 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-183" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M52.35,5 L 52.35 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-184" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-185" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M58.8,5 L 58.8 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-186" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M62.03,5 L 62.03 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-187" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M65.25,5 L 65.25 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-188" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M68.48,5 L 68.48 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-189" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M71.71,5 L 71.71 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-190" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M74.94,5 L 74.94 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-191" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M78.16,5 L 78.16 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-192" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M81.39,5 L 81.39 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-193" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M84.62,5 L 84.62 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-194" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-195" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M91.07,5 L 91.07 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-196" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M94.3,5 L 94.3 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-197" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M97.52,5 L 97.52 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-198" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M100.75,5 L 100.75 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-199" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M103.98,5 L 103.98 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-200" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M107.2,5 L 107.2 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-201" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M110.43,5 L 110.43 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-202" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M113.66,5 L 113.66 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-203" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M116.89,5 L 116.89 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-204" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-205" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M123.34,5 L 123.34 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-206" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M126.57,5 L 126.57 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-207" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M129.79,5 L 129.79 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-208" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M133.02,5 L 133.02 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-209" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M136.25,5 L 136.25 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-210" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M139.47,5 L 139.47 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-211" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M142.7,5 L 142.7 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-212" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M145.93,5 L 145.93 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-213" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M149.15,5 L 149.15 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-214" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-215" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M155.61,5 L 155.61 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-216" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M158.84,5 L 158.84 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-217" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M162.06,5 L 162.06 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-218" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M165.29,5 L 165.29 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-219" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M168.52,5 L 168.52 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-220" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M171.74,5 L 171.74 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-221" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M174.97,5 L 174.97 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-222" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M178.2,5 L 178.2 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-223" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M181.42,5 L 181.42 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-224" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-225" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M187.88,5 L 187.88 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-226" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M191.1,5 L 191.1 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-227" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M194.33,5 L 194.33 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-228" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M197.56,5 L 197.56 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-229" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M200.78,5 L 200.78 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-230" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M204.01,5 L 204.01 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-231" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M207.24,5 L 207.24 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-232" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M210.47,5 L 210.47 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-233" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M213.69,5 L 213.69 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-234" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-235" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-236" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-237" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-238" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-239" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-240" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-67.05,5 L -67.05 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-241" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-60.59,5 L -60.59 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-242" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-54.14,5 L -54.14 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-243" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-47.69,5 L -47.69 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-244" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-245" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-34.78,5 L -34.78 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-246" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-28.33,5 L -28.33 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-247" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-21.87,5 L -21.87 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-248" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-15.42,5 L -15.42 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-249" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-250" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-2.51,5 L -2.51 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-251" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M3.94,5 L 3.94 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-252" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M10.4,5 L 10.4 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-253" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M16.85,5 L 16.85 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-254" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-255" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M29.76,5 L 29.76 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-256" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M36.21,5 L 36.21 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-257" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M42.67,5 L 42.67 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-258" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M49.12,5 L 49.12 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-259" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-260" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M62.03,5 L 62.03 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-261" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M68.48,5 L 68.48 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-262" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M74.94,5 L 74.94 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-263" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M81.39,5 L 81.39 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-264" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-265" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M94.3,5 L 94.3 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-266" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M100.75,5 L 100.75 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-267" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M107.2,5 L 107.2 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-268" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M113.66,5 L 113.66 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-269" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-270" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M126.57,5 L 126.57 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-271" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M133.02,5 L 133.02 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-272" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M139.47,5 L 139.47 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-273" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M145.93,5 L 145.93 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-274" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-275" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M158.84,5 L 158.84 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-276" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M165.29,5 L 165.29 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-277" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M171.74,5 L 171.74 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-278" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M178.2,5 L 178.2 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-279" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-280" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M191.1,5 L 191.1 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-281" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M197.56,5 L 197.56 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-282" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M204.01,5 L 204.01 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-283" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M210.47,5 L 210.47 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-284" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-29ea3fd87140473598aca1082223ac51-element-285" gadfly:scale="5.0" visibility="hidden"/>
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-38e72c145f844880aa1571231609cbdc-element-132">
+      <path fill="none" d="M-105.77,5 L -105.77 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-133" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-134" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-135" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-136" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-137" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-138" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-139" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-140" gadfly:scale="1.0" visibility="visible"/>
+      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-141" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-142" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-143" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M249.19,5 L 249.19 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-144" gadfly:scale="1.0" visibility="hidden"/>
+      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-145" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-70.28,5 L -70.28 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-146" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-67.05,5 L -67.05 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-147" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-63.82,5 L -63.82 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-148" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-60.59,5 L -60.59 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-149" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-57.37,5 L -57.37 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-150" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-54.14,5 L -54.14 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-151" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-50.91,5 L -50.91 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-152" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-47.69,5 L -47.69 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-153" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-44.46,5 L -44.46 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-154" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-155" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-38.01,5 L -38.01 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-156" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-34.78,5 L -34.78 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-157" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-31.55,5 L -31.55 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-158" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-28.33,5 L -28.33 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-159" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-25.1,5 L -25.1 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-160" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-21.87,5 L -21.87 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-161" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-18.64,5 L -18.64 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-162" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-15.42,5 L -15.42 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-163" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-12.19,5 L -12.19 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-164" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-165" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-5.74,5 L -5.74 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-166" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-2.51,5 L -2.51 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-167" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M0.72,5 L 0.72 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-168" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M3.94,5 L 3.94 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-169" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M7.17,5 L 7.17 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-170" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M10.4,5 L 10.4 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-171" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M13.62,5 L 13.62 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-172" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M16.85,5 L 16.85 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-173" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M20.08,5 L 20.08 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-174" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-175" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M26.53,5 L 26.53 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-176" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M29.76,5 L 29.76 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-177" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M32.99,5 L 32.99 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-178" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M36.21,5 L 36.21 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-179" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M39.44,5 L 39.44 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-180" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M42.67,5 L 42.67 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-181" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M45.89,5 L 45.89 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-182" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M49.12,5 L 49.12 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-183" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M52.35,5 L 52.35 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-184" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-185" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M58.8,5 L 58.8 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-186" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M62.03,5 L 62.03 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-187" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M65.25,5 L 65.25 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-188" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M68.48,5 L 68.48 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-189" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M71.71,5 L 71.71 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-190" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M74.94,5 L 74.94 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-191" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M78.16,5 L 78.16 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-192" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M81.39,5 L 81.39 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-193" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M84.62,5 L 84.62 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-194" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-195" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M91.07,5 L 91.07 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-196" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M94.3,5 L 94.3 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-197" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M97.52,5 L 97.52 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-198" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M100.75,5 L 100.75 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-199" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M103.98,5 L 103.98 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-200" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M107.2,5 L 107.2 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-201" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M110.43,5 L 110.43 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-202" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M113.66,5 L 113.66 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-203" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M116.89,5 L 116.89 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-204" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-205" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M123.34,5 L 123.34 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-206" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M126.57,5 L 126.57 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-207" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M129.79,5 L 129.79 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-208" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M133.02,5 L 133.02 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-209" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M136.25,5 L 136.25 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-210" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M139.47,5 L 139.47 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-211" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M142.7,5 L 142.7 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-212" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M145.93,5 L 145.93 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-213" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M149.15,5 L 149.15 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-214" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-215" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M155.61,5 L 155.61 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-216" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M158.84,5 L 158.84 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-217" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M162.06,5 L 162.06 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-218" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M165.29,5 L 165.29 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-219" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M168.52,5 L 168.52 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-220" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M171.74,5 L 171.74 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-221" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M174.97,5 L 174.97 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-222" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M178.2,5 L 178.2 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-223" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M181.42,5 L 181.42 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-224" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-225" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M187.88,5 L 187.88 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-226" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M191.1,5 L 191.1 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-227" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M194.33,5 L 194.33 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-228" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M197.56,5 L 197.56 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-229" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M200.78,5 L 200.78 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-230" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M204.01,5 L 204.01 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-231" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M207.24,5 L 207.24 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-232" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M210.47,5 L 210.47 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-233" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M213.69,5 L 213.69 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-234" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-235" gadfly:scale="10.0" visibility="hidden"/>
+      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-236" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-237" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-238" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-239" gadfly:scale="0.5" visibility="hidden"/>
+      <path fill="none" d="M-73.5,5 L -73.5 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-240" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-67.05,5 L -67.05 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-241" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-60.59,5 L -60.59 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-242" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-54.14,5 L -54.14 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-243" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-47.69,5 L -47.69 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-244" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-41.23,5 L -41.23 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-245" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-34.78,5 L -34.78 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-246" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-28.33,5 L -28.33 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-247" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-21.87,5 L -21.87 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-248" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-15.42,5 L -15.42 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-249" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-8.96,5 L -8.96 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-250" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M-2.51,5 L -2.51 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-251" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M3.94,5 L 3.94 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-252" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M10.4,5 L 10.4 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-253" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M16.85,5 L 16.85 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-254" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M23.31,5 L 23.31 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-255" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M29.76,5 L 29.76 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-256" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M36.21,5 L 36.21 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-257" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M42.67,5 L 42.67 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-258" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M49.12,5 L 49.12 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-259" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M55.57,5 L 55.57 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-260" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M62.03,5 L 62.03 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-261" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M68.48,5 L 68.48 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-262" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M74.94,5 L 74.94 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-263" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M81.39,5 L 81.39 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-264" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M87.84,5 L 87.84 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-265" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M94.3,5 L 94.3 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-266" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M100.75,5 L 100.75 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-267" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M107.2,5 L 107.2 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-268" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M113.66,5 L 113.66 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-269" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M120.11,5 L 120.11 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-270" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M126.57,5 L 126.57 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-271" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M133.02,5 L 133.02 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-272" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M139.47,5 L 139.47 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-273" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M145.93,5 L 145.93 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-274" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M152.38,5 L 152.38 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-275" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M158.84,5 L 158.84 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-276" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M165.29,5 L 165.29 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-277" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M171.74,5 L 171.74 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-278" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M178.2,5 L 178.2 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-279" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M184.65,5 L 184.65 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-280" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M191.1,5 L 191.1 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-281" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M197.56,5 L 197.56 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-282" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M204.01,5 L 204.01 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-283" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M210.47,5 L 210.47 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-284" gadfly:scale="5.0" visibility="hidden"/>
+      <path fill="none" d="M216.92,5 L 216.92 80.72" id="fig-38e72c145f844880aa1571231609cbdc-element-285" gadfly:scale="5.0" visibility="hidden"/>
     </g>
-    <g class="plotpanel" id="fig-29ea3fd87140473598aca1082223ac51-element-286">
-      <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-29ea3fd87140473598aca1082223ac51-element-287">
-        <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-29ea3fd87140473598aca1082223ac51-element-288">
-          <rect x="23.28" y="54.19" width="32.32" height="24.53" id="fig-29ea3fd87140473598aca1082223ac51-element-289" fill="#008000"/>
-          <rect x="55.55" y="NaN" width="32.32" height="0.01" id="fig-29ea3fd87140473598aca1082223ac51-element-290" fill="#008000"/>
-          <rect x="87.82" y="NaN" width="32.32" height="0.01" id="fig-29ea3fd87140473598aca1082223ac51-element-291" fill="#008000"/>
-          <rect x="23.28" y="14.82" width="32.32" height="39.37" id="fig-29ea3fd87140473598aca1082223ac51-element-292" fill="#FF0000"/>
-          <rect x="55.55" y="NaN" width="32.32" height="0.01" id="fig-29ea3fd87140473598aca1082223ac51-element-293" fill="#FF0000"/>
-          <rect x="87.82" y="NaN" width="32.32" height="0.01" id="fig-29ea3fd87140473598aca1082223ac51-element-294" fill="#FF0000"/>
+    <g class="plotpanel" id="fig-38e72c145f844880aa1571231609cbdc-element-286">
+      <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-38e72c145f844880aa1571231609cbdc-element-287">
+        <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-38e72c145f844880aa1571231609cbdc-element-288">
+          <rect x="23.28" y="54.19" width="32.32" height="24.53" id="fig-38e72c145f844880aa1571231609cbdc-element-289" fill="#008000"/>
+          <rect x="55.55" y="NaN" width="32.32" height="0.01" id="fig-38e72c145f844880aa1571231609cbdc-element-290" fill="#008000"/>
+          <rect x="87.82" y="NaN" width="32.32" height="0.01" id="fig-38e72c145f844880aa1571231609cbdc-element-291" fill="#008000"/>
+          <rect x="23.28" y="14.82" width="32.32" height="39.37" id="fig-38e72c145f844880aa1571231609cbdc-element-292" fill="#FF0000"/>
+          <rect x="55.55" y="NaN" width="32.32" height="0.01" id="fig-38e72c145f844880aa1571231609cbdc-element-293" fill="#FF0000"/>
+          <rect x="87.82" y="NaN" width="32.32" height="0.01" id="fig-38e72c145f844880aa1571231609cbdc-element-294" fill="#FF0000"/>
         </g>
       </g>
     </g>
-    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-29ea3fd87140473598aca1082223ac51-element-295">
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-29ea3fd87140473598aca1082223ac51-element-296">
-        <rect x="115.11" y="8" width="4" height="4" id="fig-29ea3fd87140473598aca1082223ac51-element-297"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-29ea3fd87140473598aca1082223ac51-element-298">
-          <path d="M115.91,9.6 L 116.71 9.6 116.71 8.8 117.51 8.8 117.51 9.6 118.31 9.6 118.31 10.4 117.51 10.4 117.51 11.2 116.71 11.2 116.71 10.4 115.91 10.4 z" id="fig-29ea3fd87140473598aca1082223ac51-element-299"/>
+    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-38e72c145f844880aa1571231609cbdc-element-295">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-38e72c145f844880aa1571231609cbdc-element-296">
+        <rect x="115.11" y="8" width="4" height="4" id="fig-38e72c145f844880aa1571231609cbdc-element-297"/>
+        <g class="button_logo" fill="#6A6A6A" id="fig-38e72c145f844880aa1571231609cbdc-element-298">
+          <path d="M115.91,9.6 L 116.71 9.6 116.71 8.8 117.51 8.8 117.51 9.6 118.31 9.6 118.31 10.4 117.51 10.4 117.51 11.2 116.71 11.2 116.71 10.4 115.91 10.4 z" id="fig-38e72c145f844880aa1571231609cbdc-element-299"/>
         </g>
       </g>
-      <g fill="#EAEAEA" id="fig-29ea3fd87140473598aca1082223ac51-element-300">
-        <rect x="95.61" y="8" width="19" height="4" id="fig-29ea3fd87140473598aca1082223ac51-element-301"/>
+      <g fill="#EAEAEA" id="fig-38e72c145f844880aa1571231609cbdc-element-300">
+        <rect x="95.61" y="8" width="19" height="4" id="fig-38e72c145f844880aa1571231609cbdc-element-301"/>
       </g>
-      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-29ea3fd87140473598aca1082223ac51-element-302">
-        <rect x="104.11" y="8" width="2" height="4" id="fig-29ea3fd87140473598aca1082223ac51-element-303"/>
+      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-38e72c145f844880aa1571231609cbdc-element-302">
+        <rect x="104.11" y="8" width="2" height="4" id="fig-38e72c145f844880aa1571231609cbdc-element-303"/>
       </g>
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-29ea3fd87140473598aca1082223ac51-element-304">
-        <rect x="91.11" y="8" width="4" height="4" id="fig-29ea3fd87140473598aca1082223ac51-element-305"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-29ea3fd87140473598aca1082223ac51-element-306">
-          <path d="M91.91,9.6 L 94.31 9.6 94.31 10.4 91.91 10.4 z" id="fig-29ea3fd87140473598aca1082223ac51-element-307"/>
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-38e72c145f844880aa1571231609cbdc-element-304">
+        <rect x="91.11" y="8" width="4" height="4" id="fig-38e72c145f844880aa1571231609cbdc-element-305"/>
+        <g class="button_logo" fill="#6A6A6A" id="fig-38e72c145f844880aa1571231609cbdc-element-306">
+          <path d="M91.91,9.6 L 94.31 9.6 94.31 10.4 91.91 10.4 z" id="fig-38e72c145f844880aa1571231609cbdc-element-307"/>
         </g>
       </g>
     </g>
   </g>
-  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-29ea3fd87140473598aca1082223ac51-element-308">
-    <text x="20.31" y="164.77" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-309" gadfly:scale="1.0" visibility="hidden">-1200</text>
-    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-310" gadfly:scale="1.0" visibility="hidden">-1000</text>
-    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-311" gadfly:scale="1.0" visibility="hidden">-800</text>
-    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-312" gadfly:scale="1.0" visibility="hidden">-600</text>
-    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-313" gadfly:scale="1.0" visibility="hidden">-400</text>
-    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-314" gadfly:scale="1.0" visibility="hidden">-200</text>
-    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-315" gadfly:scale="1.0" visibility="visible">0</text>
-    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-316" gadfly:scale="1.0" visibility="visible">200</text>
-    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-317" gadfly:scale="1.0" visibility="visible">400</text>
-    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-318" gadfly:scale="1.0" visibility="visible">600</text>
-    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-319" gadfly:scale="1.0" visibility="visible">800</text>
-    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-320" gadfly:scale="1.0" visibility="visible">1000</text>
-    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-321" gadfly:scale="1.0" visibility="hidden">1200</text>
-    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-322" gadfly:scale="1.0" visibility="hidden">1400</text>
-    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-323" gadfly:scale="1.0" visibility="hidden">1600</text>
-    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-324" gadfly:scale="1.0" visibility="hidden">1800</text>
-    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-325" gadfly:scale="1.0" visibility="hidden">2000</text>
-    <text x="20.31" y="-79.06" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-326" gadfly:scale="1.0" visibility="hidden">2200</text>
-    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-327" gadfly:scale="10.0" visibility="hidden">-1000</text>
-    <text x="20.31" y="146.84" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-328" gadfly:scale="10.0" visibility="hidden">-950</text>
-    <text x="20.31" y="143.26" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-329" gadfly:scale="10.0" visibility="hidden">-900</text>
-    <text x="20.31" y="139.67" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-330" gadfly:scale="10.0" visibility="hidden">-850</text>
-    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-331" gadfly:scale="10.0" visibility="hidden">-800</text>
-    <text x="20.31" y="132.5" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-332" gadfly:scale="10.0" visibility="hidden">-750</text>
-    <text x="20.31" y="128.92" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-333" gadfly:scale="10.0" visibility="hidden">-700</text>
-    <text x="20.31" y="125.33" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-334" gadfly:scale="10.0" visibility="hidden">-650</text>
-    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-335" gadfly:scale="10.0" visibility="hidden">-600</text>
-    <text x="20.31" y="118.16" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-336" gadfly:scale="10.0" visibility="hidden">-550</text>
-    <text x="20.31" y="114.57" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-337" gadfly:scale="10.0" visibility="hidden">-500</text>
-    <text x="20.31" y="110.99" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-338" gadfly:scale="10.0" visibility="hidden">-450</text>
-    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-339" gadfly:scale="10.0" visibility="hidden">-400</text>
-    <text x="20.31" y="103.82" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-340" gadfly:scale="10.0" visibility="hidden">-350</text>
-    <text x="20.31" y="100.23" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-341" gadfly:scale="10.0" visibility="hidden">-300</text>
-    <text x="20.31" y="96.64" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-342" gadfly:scale="10.0" visibility="hidden">-250</text>
-    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-343" gadfly:scale="10.0" visibility="hidden">-200</text>
-    <text x="20.31" y="89.47" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-344" gadfly:scale="10.0" visibility="hidden">-150</text>
-    <text x="20.31" y="85.89" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-345" gadfly:scale="10.0" visibility="hidden">-100</text>
-    <text x="20.31" y="82.3" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-346" gadfly:scale="10.0" visibility="hidden">-50</text>
-    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-347" gadfly:scale="10.0" visibility="hidden">0</text>
-    <text x="20.31" y="75.13" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-348" gadfly:scale="10.0" visibility="hidden">50</text>
-    <text x="20.31" y="71.54" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-349" gadfly:scale="10.0" visibility="hidden">100</text>
-    <text x="20.31" y="67.96" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-350" gadfly:scale="10.0" visibility="hidden">150</text>
-    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-351" gadfly:scale="10.0" visibility="hidden">200</text>
-    <text x="20.31" y="60.79" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-352" gadfly:scale="10.0" visibility="hidden">250</text>
-    <text x="20.31" y="57.2" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-353" gadfly:scale="10.0" visibility="hidden">300</text>
-    <text x="20.31" y="53.61" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-354" gadfly:scale="10.0" visibility="hidden">350</text>
-    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-355" gadfly:scale="10.0" visibility="hidden">400</text>
-    <text x="20.31" y="46.44" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-356" gadfly:scale="10.0" visibility="hidden">450</text>
-    <text x="20.31" y="42.86" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-357" gadfly:scale="10.0" visibility="hidden">500</text>
-    <text x="20.31" y="39.27" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-358" gadfly:scale="10.0" visibility="hidden">550</text>
-    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-359" gadfly:scale="10.0" visibility="hidden">600</text>
-    <text x="20.31" y="32.1" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-360" gadfly:scale="10.0" visibility="hidden">650</text>
-    <text x="20.31" y="28.51" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-361" gadfly:scale="10.0" visibility="hidden">700</text>
-    <text x="20.31" y="24.93" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-362" gadfly:scale="10.0" visibility="hidden">750</text>
-    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-363" gadfly:scale="10.0" visibility="hidden">800</text>
-    <text x="20.31" y="17.76" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-364" gadfly:scale="10.0" visibility="hidden">850</text>
-    <text x="20.31" y="14.17" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-365" gadfly:scale="10.0" visibility="hidden">900</text>
-    <text x="20.31" y="10.59" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-366" gadfly:scale="10.0" visibility="hidden">950</text>
-    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-367" gadfly:scale="10.0" visibility="hidden">1000</text>
-    <text x="20.31" y="3.41" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-368" gadfly:scale="10.0" visibility="hidden">1050</text>
-    <text x="20.31" y="-0.17" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-369" gadfly:scale="10.0" visibility="hidden">1100</text>
-    <text x="20.31" y="-3.76" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-370" gadfly:scale="10.0" visibility="hidden">1150</text>
-    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-371" gadfly:scale="10.0" visibility="hidden">1200</text>
-    <text x="20.31" y="-10.93" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-372" gadfly:scale="10.0" visibility="hidden">1250</text>
-    <text x="20.31" y="-14.51" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-373" gadfly:scale="10.0" visibility="hidden">1300</text>
-    <text x="20.31" y="-18.1" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-374" gadfly:scale="10.0" visibility="hidden">1350</text>
-    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-375" gadfly:scale="10.0" visibility="hidden">1400</text>
-    <text x="20.31" y="-25.27" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-376" gadfly:scale="10.0" visibility="hidden">1450</text>
-    <text x="20.31" y="-28.86" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-377" gadfly:scale="10.0" visibility="hidden">1500</text>
-    <text x="20.31" y="-32.44" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-378" gadfly:scale="10.0" visibility="hidden">1550</text>
-    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-379" gadfly:scale="10.0" visibility="hidden">1600</text>
-    <text x="20.31" y="-39.61" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-380" gadfly:scale="10.0" visibility="hidden">1650</text>
-    <text x="20.31" y="-43.2" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-381" gadfly:scale="10.0" visibility="hidden">1700</text>
-    <text x="20.31" y="-46.79" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-382" gadfly:scale="10.0" visibility="hidden">1750</text>
-    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-383" gadfly:scale="10.0" visibility="hidden">1800</text>
-    <text x="20.31" y="-53.96" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-384" gadfly:scale="10.0" visibility="hidden">1850</text>
-    <text x="20.31" y="-57.54" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-385" gadfly:scale="10.0" visibility="hidden">1900</text>
-    <text x="20.31" y="-61.13" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-386" gadfly:scale="10.0" visibility="hidden">1950</text>
-    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-387" gadfly:scale="10.0" visibility="hidden">2000</text>
-    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-388" gadfly:scale="0.5" visibility="hidden">-1000</text>
-    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-389" gadfly:scale="0.5" visibility="hidden">0</text>
-    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-390" gadfly:scale="0.5" visibility="hidden">1000</text>
-    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-391" gadfly:scale="0.5" visibility="hidden">2000</text>
-    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-392" gadfly:scale="5.0" visibility="hidden">-1000</text>
-    <text x="20.31" y="143.26" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-393" gadfly:scale="5.0" visibility="hidden">-900</text>
-    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-394" gadfly:scale="5.0" visibility="hidden">-800</text>
-    <text x="20.31" y="128.92" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-395" gadfly:scale="5.0" visibility="hidden">-700</text>
-    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-396" gadfly:scale="5.0" visibility="hidden">-600</text>
-    <text x="20.31" y="114.57" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-397" gadfly:scale="5.0" visibility="hidden">-500</text>
-    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-398" gadfly:scale="5.0" visibility="hidden">-400</text>
-    <text x="20.31" y="100.23" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-399" gadfly:scale="5.0" visibility="hidden">-300</text>
-    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-400" gadfly:scale="5.0" visibility="hidden">-200</text>
-    <text x="20.31" y="85.89" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-401" gadfly:scale="5.0" visibility="hidden">-100</text>
-    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-402" gadfly:scale="5.0" visibility="hidden">0</text>
-    <text x="20.31" y="71.54" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-403" gadfly:scale="5.0" visibility="hidden">100</text>
-    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-404" gadfly:scale="5.0" visibility="hidden">200</text>
-    <text x="20.31" y="57.2" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-405" gadfly:scale="5.0" visibility="hidden">300</text>
-    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-406" gadfly:scale="5.0" visibility="hidden">400</text>
-    <text x="20.31" y="42.86" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-407" gadfly:scale="5.0" visibility="hidden">500</text>
-    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-408" gadfly:scale="5.0" visibility="hidden">600</text>
-    <text x="20.31" y="28.51" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-409" gadfly:scale="5.0" visibility="hidden">700</text>
-    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-410" gadfly:scale="5.0" visibility="hidden">800</text>
-    <text x="20.31" y="14.17" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-411" gadfly:scale="5.0" visibility="hidden">900</text>
-    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-412" gadfly:scale="5.0" visibility="hidden">1000</text>
-    <text x="20.31" y="-0.17" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-413" gadfly:scale="5.0" visibility="hidden">1100</text>
-    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-414" gadfly:scale="5.0" visibility="hidden">1200</text>
-    <text x="20.31" y="-14.51" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-415" gadfly:scale="5.0" visibility="hidden">1300</text>
-    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-416" gadfly:scale="5.0" visibility="hidden">1400</text>
-    <text x="20.31" y="-28.86" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-417" gadfly:scale="5.0" visibility="hidden">1500</text>
-    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-418" gadfly:scale="5.0" visibility="hidden">1600</text>
-    <text x="20.31" y="-43.2" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-419" gadfly:scale="5.0" visibility="hidden">1700</text>
-    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-420" gadfly:scale="5.0" visibility="hidden">1800</text>
-    <text x="20.31" y="-57.54" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-421" gadfly:scale="5.0" visibility="hidden">1900</text>
-    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-29ea3fd87140473598aca1082223ac51-element-422" gadfly:scale="5.0" visibility="hidden">2000</text>
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-38e72c145f844880aa1571231609cbdc-element-308">
+    <text x="20.31" y="164.77" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-309" gadfly:scale="1.0" visibility="hidden">-1200</text>
+    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-310" gadfly:scale="1.0" visibility="hidden">-1000</text>
+    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-311" gadfly:scale="1.0" visibility="hidden">-800</text>
+    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-312" gadfly:scale="1.0" visibility="hidden">-600</text>
+    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-313" gadfly:scale="1.0" visibility="hidden">-400</text>
+    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-314" gadfly:scale="1.0" visibility="hidden">-200</text>
+    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-315" gadfly:scale="1.0" visibility="visible">0</text>
+    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-316" gadfly:scale="1.0" visibility="visible">200</text>
+    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-317" gadfly:scale="1.0" visibility="visible">400</text>
+    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-318" gadfly:scale="1.0" visibility="visible">600</text>
+    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-319" gadfly:scale="1.0" visibility="visible">800</text>
+    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-320" gadfly:scale="1.0" visibility="visible">1000</text>
+    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-321" gadfly:scale="1.0" visibility="hidden">1200</text>
+    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-322" gadfly:scale="1.0" visibility="hidden">1400</text>
+    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-323" gadfly:scale="1.0" visibility="hidden">1600</text>
+    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-324" gadfly:scale="1.0" visibility="hidden">1800</text>
+    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-325" gadfly:scale="1.0" visibility="hidden">2000</text>
+    <text x="20.31" y="-79.06" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-326" gadfly:scale="1.0" visibility="hidden">2200</text>
+    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-327" gadfly:scale="10.0" visibility="hidden">-1000</text>
+    <text x="20.31" y="146.84" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-328" gadfly:scale="10.0" visibility="hidden">-950</text>
+    <text x="20.31" y="143.26" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-329" gadfly:scale="10.0" visibility="hidden">-900</text>
+    <text x="20.31" y="139.67" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-330" gadfly:scale="10.0" visibility="hidden">-850</text>
+    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-331" gadfly:scale="10.0" visibility="hidden">-800</text>
+    <text x="20.31" y="132.5" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-332" gadfly:scale="10.0" visibility="hidden">-750</text>
+    <text x="20.31" y="128.92" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-333" gadfly:scale="10.0" visibility="hidden">-700</text>
+    <text x="20.31" y="125.33" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-334" gadfly:scale="10.0" visibility="hidden">-650</text>
+    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-335" gadfly:scale="10.0" visibility="hidden">-600</text>
+    <text x="20.31" y="118.16" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-336" gadfly:scale="10.0" visibility="hidden">-550</text>
+    <text x="20.31" y="114.57" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-337" gadfly:scale="10.0" visibility="hidden">-500</text>
+    <text x="20.31" y="110.99" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-338" gadfly:scale="10.0" visibility="hidden">-450</text>
+    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-339" gadfly:scale="10.0" visibility="hidden">-400</text>
+    <text x="20.31" y="103.82" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-340" gadfly:scale="10.0" visibility="hidden">-350</text>
+    <text x="20.31" y="100.23" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-341" gadfly:scale="10.0" visibility="hidden">-300</text>
+    <text x="20.31" y="96.64" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-342" gadfly:scale="10.0" visibility="hidden">-250</text>
+    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-343" gadfly:scale="10.0" visibility="hidden">-200</text>
+    <text x="20.31" y="89.47" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-344" gadfly:scale="10.0" visibility="hidden">-150</text>
+    <text x="20.31" y="85.89" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-345" gadfly:scale="10.0" visibility="hidden">-100</text>
+    <text x="20.31" y="82.3" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-346" gadfly:scale="10.0" visibility="hidden">-50</text>
+    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-347" gadfly:scale="10.0" visibility="hidden">0</text>
+    <text x="20.31" y="75.13" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-348" gadfly:scale="10.0" visibility="hidden">50</text>
+    <text x="20.31" y="71.54" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-349" gadfly:scale="10.0" visibility="hidden">100</text>
+    <text x="20.31" y="67.96" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-350" gadfly:scale="10.0" visibility="hidden">150</text>
+    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-351" gadfly:scale="10.0" visibility="hidden">200</text>
+    <text x="20.31" y="60.79" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-352" gadfly:scale="10.0" visibility="hidden">250</text>
+    <text x="20.31" y="57.2" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-353" gadfly:scale="10.0" visibility="hidden">300</text>
+    <text x="20.31" y="53.61" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-354" gadfly:scale="10.0" visibility="hidden">350</text>
+    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-355" gadfly:scale="10.0" visibility="hidden">400</text>
+    <text x="20.31" y="46.44" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-356" gadfly:scale="10.0" visibility="hidden">450</text>
+    <text x="20.31" y="42.86" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-357" gadfly:scale="10.0" visibility="hidden">500</text>
+    <text x="20.31" y="39.27" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-358" gadfly:scale="10.0" visibility="hidden">550</text>
+    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-359" gadfly:scale="10.0" visibility="hidden">600</text>
+    <text x="20.31" y="32.1" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-360" gadfly:scale="10.0" visibility="hidden">650</text>
+    <text x="20.31" y="28.51" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-361" gadfly:scale="10.0" visibility="hidden">700</text>
+    <text x="20.31" y="24.93" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-362" gadfly:scale="10.0" visibility="hidden">750</text>
+    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-363" gadfly:scale="10.0" visibility="hidden">800</text>
+    <text x="20.31" y="17.76" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-364" gadfly:scale="10.0" visibility="hidden">850</text>
+    <text x="20.31" y="14.17" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-365" gadfly:scale="10.0" visibility="hidden">900</text>
+    <text x="20.31" y="10.59" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-366" gadfly:scale="10.0" visibility="hidden">950</text>
+    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-367" gadfly:scale="10.0" visibility="hidden">1000</text>
+    <text x="20.31" y="3.41" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-368" gadfly:scale="10.0" visibility="hidden">1050</text>
+    <text x="20.31" y="-0.17" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-369" gadfly:scale="10.0" visibility="hidden">1100</text>
+    <text x="20.31" y="-3.76" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-370" gadfly:scale="10.0" visibility="hidden">1150</text>
+    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-371" gadfly:scale="10.0" visibility="hidden">1200</text>
+    <text x="20.31" y="-10.93" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-372" gadfly:scale="10.0" visibility="hidden">1250</text>
+    <text x="20.31" y="-14.51" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-373" gadfly:scale="10.0" visibility="hidden">1300</text>
+    <text x="20.31" y="-18.1" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-374" gadfly:scale="10.0" visibility="hidden">1350</text>
+    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-375" gadfly:scale="10.0" visibility="hidden">1400</text>
+    <text x="20.31" y="-25.27" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-376" gadfly:scale="10.0" visibility="hidden">1450</text>
+    <text x="20.31" y="-28.86" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-377" gadfly:scale="10.0" visibility="hidden">1500</text>
+    <text x="20.31" y="-32.44" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-378" gadfly:scale="10.0" visibility="hidden">1550</text>
+    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-379" gadfly:scale="10.0" visibility="hidden">1600</text>
+    <text x="20.31" y="-39.61" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-380" gadfly:scale="10.0" visibility="hidden">1650</text>
+    <text x="20.31" y="-43.2" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-381" gadfly:scale="10.0" visibility="hidden">1700</text>
+    <text x="20.31" y="-46.79" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-382" gadfly:scale="10.0" visibility="hidden">1750</text>
+    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-383" gadfly:scale="10.0" visibility="hidden">1800</text>
+    <text x="20.31" y="-53.96" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-384" gadfly:scale="10.0" visibility="hidden">1850</text>
+    <text x="20.31" y="-57.54" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-385" gadfly:scale="10.0" visibility="hidden">1900</text>
+    <text x="20.31" y="-61.13" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-386" gadfly:scale="10.0" visibility="hidden">1950</text>
+    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-387" gadfly:scale="10.0" visibility="hidden">2000</text>
+    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-388" gadfly:scale="0.5" visibility="hidden">-1000</text>
+    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-389" gadfly:scale="0.5" visibility="hidden">0</text>
+    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-390" gadfly:scale="0.5" visibility="hidden">1000</text>
+    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-391" gadfly:scale="0.5" visibility="hidden">2000</text>
+    <text x="20.31" y="150.43" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-392" gadfly:scale="5.0" visibility="hidden">-1000</text>
+    <text x="20.31" y="143.26" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-393" gadfly:scale="5.0" visibility="hidden">-900</text>
+    <text x="20.31" y="136.09" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-394" gadfly:scale="5.0" visibility="hidden">-800</text>
+    <text x="20.31" y="128.92" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-395" gadfly:scale="5.0" visibility="hidden">-700</text>
+    <text x="20.31" y="121.74" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-396" gadfly:scale="5.0" visibility="hidden">-600</text>
+    <text x="20.31" y="114.57" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-397" gadfly:scale="5.0" visibility="hidden">-500</text>
+    <text x="20.31" y="107.4" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-398" gadfly:scale="5.0" visibility="hidden">-400</text>
+    <text x="20.31" y="100.23" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-399" gadfly:scale="5.0" visibility="hidden">-300</text>
+    <text x="20.31" y="93.06" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-400" gadfly:scale="5.0" visibility="hidden">-200</text>
+    <text x="20.31" y="85.89" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-401" gadfly:scale="5.0" visibility="hidden">-100</text>
+    <text x="20.31" y="78.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-402" gadfly:scale="5.0" visibility="hidden">0</text>
+    <text x="20.31" y="71.54" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-403" gadfly:scale="5.0" visibility="hidden">100</text>
+    <text x="20.31" y="64.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-404" gadfly:scale="5.0" visibility="hidden">200</text>
+    <text x="20.31" y="57.2" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-405" gadfly:scale="5.0" visibility="hidden">300</text>
+    <text x="20.31" y="50.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-406" gadfly:scale="5.0" visibility="hidden">400</text>
+    <text x="20.31" y="42.86" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-407" gadfly:scale="5.0" visibility="hidden">500</text>
+    <text x="20.31" y="35.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-408" gadfly:scale="5.0" visibility="hidden">600</text>
+    <text x="20.31" y="28.51" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-409" gadfly:scale="5.0" visibility="hidden">700</text>
+    <text x="20.31" y="21.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-410" gadfly:scale="5.0" visibility="hidden">800</text>
+    <text x="20.31" y="14.17" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-411" gadfly:scale="5.0" visibility="hidden">900</text>
+    <text x="20.31" y="7" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-412" gadfly:scale="5.0" visibility="hidden">1000</text>
+    <text x="20.31" y="-0.17" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-413" gadfly:scale="5.0" visibility="hidden">1100</text>
+    <text x="20.31" y="-7.34" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-414" gadfly:scale="5.0" visibility="hidden">1200</text>
+    <text x="20.31" y="-14.51" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-415" gadfly:scale="5.0" visibility="hidden">1300</text>
+    <text x="20.31" y="-21.69" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-416" gadfly:scale="5.0" visibility="hidden">1400</text>
+    <text x="20.31" y="-28.86" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-417" gadfly:scale="5.0" visibility="hidden">1500</text>
+    <text x="20.31" y="-36.03" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-418" gadfly:scale="5.0" visibility="hidden">1600</text>
+    <text x="20.31" y="-43.2" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-419" gadfly:scale="5.0" visibility="hidden">1700</text>
+    <text x="20.31" y="-50.37" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-420" gadfly:scale="5.0" visibility="hidden">1800</text>
+    <text x="20.31" y="-57.54" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-421" gadfly:scale="5.0" visibility="hidden">1900</text>
+    <text x="20.31" y="-64.72" text-anchor="end" dy="0.35em" id="fig-38e72c145f844880aa1571231609cbdc-element-422" gadfly:scale="5.0" visibility="hidden">2000</text>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-29ea3fd87140473598aca1082223ac51-element-423">
-    <text x="8.81" y="40.86" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 42.86)" id="fig-29ea3fd87140473598aca1082223ac51-element-424">Survived</text>
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-38e72c145f844880aa1571231609cbdc-element-423">
+    <text x="8.81" y="40.86" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 42.86)" id="fig-38e72c145f844880aa1571231609cbdc-element-424">Survived</text>
   </g>
 </g>
 <defs>
-<clipPath id="fig-29ea3fd87140473598aca1082223ac51-element-14">
+<clipPath id="fig-38e72c145f844880aa1571231609cbdc-element-14">
   <path d="M21.31,5 L 122.11 5 122.11 80.72 21.31 80.72" />
 </clipPath
 ></defs>
@@ -3374,26 +3277,26 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-29ea3fd87140473598aca1082223ac51");
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-4")
+    var fig = Snap("#fig-38e72c145f844880aa1571231609cbdc");
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-4")
    .drag(function() {}, function() {}, function() {});
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-6")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-6")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-7")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-7")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-9")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-9")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-10")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-10")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-13")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-13")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -3401,63 +3304,63 @@ fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-13")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-17")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-17")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-17")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-17")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-132")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-132")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-132")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-132")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-296")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-296")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-296")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-296")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-296")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-296")
    .click(Gadfly.zoomslider_zoomin_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-300")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-300")
    .data("max_pos", 106.11)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-300")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-300")
    .data("min_pos", 89.11)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-300")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-300")
    .click(Gadfly.zoomslider_track_click);
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-302")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-302")
    .data("max_pos", 106.11)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-302")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-302")
    .data("min_pos", 89.11)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-302")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-302")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-302")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-302")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-302")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-302")
    .drag(Gadfly.zoomslider_thumb_dragmove,
      Gadfly.zoomslider_thumb_dragstart,
      Gadfly.zoomslider_thumb_dragend)
 .mousedown(Gadfly.zoomslider_thumb_mousedown)
 .mouseup(Gadfly.zoomslider_thumb_mouseup)
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-304")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-304")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-304")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-304")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-304")
+fig.select("#fig-38e72c145f844880aa1571231609cbdc-element-304")
    .click(Gadfly.zoomslider_zoomout_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
@@ -3468,6 +3371,10 @@ fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-304")
 
 
 
+
+We see the number of Children survived is lower than the number of victims.
+
+Let try to combine the gender and child variables to see how that impacts the survival rate. We go back to our friendly bug Gadfly to construct a stacked histogram with subplots.
 
 
     plot(train, xgroup="Child", x="Sex", y="Survived", color="Survived", Geom.subplot_grid(Geom.histogram(position=:stack)), Scale.color_discrete_manual("red","green"))
@@ -3486,412 +3393,412 @@ fig.select("#fig-29ea3fd87140473598aca1082223ac51-element-304")
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-3f54ecb2afae43efb2f60447306cc4db">
-<g class="plotroot yscalable" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-2">
+     id="fig-bfd50a7b48c642b69caac82982e1df15">
+<g class="plotroot yscalable" id="fig-bfd50a7b48c642b69caac82982e1df15-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-2">
     <text x="67.36" y="88.39" text-anchor="middle" dy="0.6em">Sex <tspan style="dominant-baseline:inherit" font-style="italic"><tspan style="dominant-baseline:inherit" font-weight="bold">by</tspan></tspan> Child</text>
   </g>
-  <g class="guide colorkey" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-3">
-    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-4">
-      <text x="125.93" y="45.19" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-5" class="color_0">0</text>
-      <text x="125.93" y="48.82" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-6" class="color_1">1</text>
+  <g class="guide colorkey" id="fig-bfd50a7b48c642b69caac82982e1df15-element-3">
+    <g fill="#4C404B" font-size="2.82" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" id="fig-bfd50a7b48c642b69caac82982e1df15-element-4">
+      <text x="125.93" y="45.19" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-5" class="color_0">0</text>
+      <text x="125.93" y="48.82" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-6" class="color_1">1</text>
     </g>
-    <g stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-7">
-      <rect x="123.11" y="44.29" width="1.81" height="1.81" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-8" class="color_0" fill="#FF0000"/>
-      <rect x="123.11" y="47.91" width="1.81" height="1.81" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-9" class="color_1" fill="#008000"/>
+    <g stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-7">
+      <rect x="123.11" y="44.29" width="1.81" height="1.81" id="fig-bfd50a7b48c642b69caac82982e1df15-element-8" class="color_0" fill="#FF0000"/>
+      <rect x="123.11" y="47.91" width="1.81" height="1.81" id="fig-bfd50a7b48c642b69caac82982e1df15-element-9" class="color_1" fill="#008000"/>
     </g>
-    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-10">
-      <text x="123.11" y="41.37" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-11">Survived</text>
+    <g fill="#362A35" font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-10">
+      <text x="123.11" y="41.37" id="fig-bfd50a7b48c642b69caac82982e1df15-element-11">Survived</text>
     </g>
   </g>
-  <g clip-path="url(#fig-3f54ecb2afae43efb2f60447306cc4db-element-13)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-12">
-    <g class="plotpanel" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-14">
-      <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-15">
-        <text x="96.49" y="80.27" text-anchor="end" dy="0.35em" transform="rotate(-90, 96.49, 80.27)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-16">1</text>
+  <g clip-path="url(#fig-bfd50a7b48c642b69caac82982e1df15-element-13)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-12">
+    <g class="plotpanel" id="fig-bfd50a7b48c642b69caac82982e1df15-element-14">
+      <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-15">
+        <text x="96.49" y="80.27" text-anchor="end" dy="0.35em" transform="rotate(-90, 96.49, 80.27)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-16">1</text>
       </g>
-      <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-17">
-        <text x="44.25" y="80.27" text-anchor="end" dy="0.35em" transform="rotate(-90, 44.25, 80.27)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-18">0</text>
+      <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-17">
+        <text x="44.25" y="80.27" text-anchor="end" dy="0.35em" transform="rotate(-90, 44.25, 80.27)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-18">0</text>
       </g>
-      <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-19">
-        <text x="84.68" y="76.27" text-anchor="middle" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-20" gadfly:scale="1.0" visibility="visible">male</text>
-        <text x="108.3" y="76.27" text-anchor="middle" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-21" gadfly:scale="1.0" visibility="visible">female</text>
+      <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-bfd50a7b48c642b69caac82982e1df15-element-19">
+        <text x="84.68" y="76.27" text-anchor="middle" id="fig-bfd50a7b48c642b69caac82982e1df15-element-20" gadfly:scale="1.0" visibility="visible">male</text>
+        <text x="108.3" y="76.27" text-anchor="middle" id="fig-bfd50a7b48c642b69caac82982e1df15-element-21" gadfly:scale="1.0" visibility="visible">female</text>
       </g>
-      <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-22">
-        <text x="31.94" y="76.27" text-anchor="middle" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-23" gadfly:scale="1.0" visibility="visible">male</text>
-        <text x="56.56" y="76.27" text-anchor="middle" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-24" gadfly:scale="1.0" visibility="visible">female</text>
+      <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-bfd50a7b48c642b69caac82982e1df15-element-22">
+        <text x="31.94" y="76.27" text-anchor="middle" id="fig-bfd50a7b48c642b69caac82982e1df15-element-23" gadfly:scale="1.0" visibility="visible">male</text>
+        <text x="56.56" y="76.27" text-anchor="middle" id="fig-bfd50a7b48c642b69caac82982e1df15-element-24" gadfly:scale="1.0" visibility="visible">female</text>
       </g>
-      <g clip-path="url(#fig-3f54ecb2afae43efb2f60447306cc4db-element-26)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-25">
-        <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-27">
-          <rect x="72.87" y="7" width="47.24" height="65.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-28"/>
+      <g clip-path="url(#fig-bfd50a7b48c642b69caac82982e1df15-element-26)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-25">
+        <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-bfd50a7b48c642b69caac82982e1df15-element-27">
+          <rect x="72.87" y="7" width="47.24" height="65.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-28"/>
         </g>
-        <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-29">
-          <path fill="none" d="M72.87,147.59 L 120.11 147.59" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-30" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-31" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-32" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-33" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-34" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-35" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-36" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-37" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-38" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-39" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-40" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-41" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-42" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-43" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-68 L 120.11 -68" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-44" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-45" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,129.12 L 120.11 129.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-46" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,126.04 L 120.11 126.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-47" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,122.96 L 120.11 122.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-48" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,119.88 L 120.11 119.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-49" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-50" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,113.72 L 120.11 113.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-51" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,110.64 L 120.11 110.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-52" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,107.56 L 120.11 107.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-53" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,104.48 L 120.11 104.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-54" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-55" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,98.32 L 120.11 98.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-56" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,95.24 L 120.11 95.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-57" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,92.16 L 120.11 92.16" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-58" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,89.08 L 120.11 89.08" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-59" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-60" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,82.92 L 120.11 82.92" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-61" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,79.84 L 120.11 79.84" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-62" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,76.76 L 120.11 76.76" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-63" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,73.68 L 120.11 73.68" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-64" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-65" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,67.52 L 120.11 67.52" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-66" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,64.44 L 120.11 64.44" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-67" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,61.36 L 120.11 61.36" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-68" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,58.28 L 120.11 58.28" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-69" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-70" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,52.12 L 120.11 52.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-71" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,49.04 L 120.11 49.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-72" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,45.96 L 120.11 45.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-73" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,42.88 L 120.11 42.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-74" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-75" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,36.72 L 120.11 36.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-76" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,33.64 L 120.11 33.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-77" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,30.56 L 120.11 30.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-78" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,27.48 L 120.11 27.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-79" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-80" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,21.32 L 120.11 21.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-81" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,18.24 L 120.11 18.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-82" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,15.16 L 120.11 15.16" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-83" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,12.08 L 120.11 12.08" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-84" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-85" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,5.92 L 120.11 5.92" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-86" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,2.84 L 120.11 2.84" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-87" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-0.24 L 120.11 -0.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-88" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-3.32 L 120.11 -3.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-89" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-90" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-9.48 L 120.11 -9.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-91" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-12.56 L 120.11 -12.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-92" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-15.64 L 120.11 -15.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-93" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-18.72 L 120.11 -18.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-94" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-95" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-24.88 L 120.11 -24.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-96" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-27.96 L 120.11 -27.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-97" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-31.04 L 120.11 -31.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-98" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-34.12 L 120.11 -34.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-99" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-100" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-40.28 L 120.11 -40.28" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-101" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-43.36 L 120.11 -43.36" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-102" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-46.44 L 120.11 -46.44" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-103" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-49.52 L 120.11 -49.52" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-104" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-105" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,147.59 L 120.11 147.59" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-106" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-107" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-108" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M72.87,-83.4 L 120.11 -83.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-109" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-110" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,124.5 L 120.11 124.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-111" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-112" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,109.1 L 120.11 109.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-113" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-114" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,93.7 L 120.11 93.7" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-115" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-116" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,78.3 L 120.11 78.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-117" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-118" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,62.9 L 120.11 62.9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-119" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-120" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,47.5 L 120.11 47.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-121" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-122" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,32.1 L 120.11 32.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-123" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-124" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,16.7 L 120.11 16.7" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-125" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-126" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,1.3 L 120.11 1.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-127" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-128" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-14.1 L 120.11 -14.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-129" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-130" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-29.5 L 120.11 -29.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-131" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-132" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-44.9 L 120.11 -44.9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-133" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-134" gadfly:scale="5.0" visibility="hidden"/>
+        <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-bfd50a7b48c642b69caac82982e1df15-element-29">
+          <path fill="none" d="M72.87,147.59 L 120.11 147.59" id="fig-bfd50a7b48c642b69caac82982e1df15-element-30" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-31" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-32" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-33" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-34" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-35" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-36" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-37" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-38" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-39" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-40" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-41" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-42" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-43" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-68 L 120.11 -68" id="fig-bfd50a7b48c642b69caac82982e1df15-element-44" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-45" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,129.12 L 120.11 129.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-46" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,126.04 L 120.11 126.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-47" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,122.96 L 120.11 122.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-48" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,119.88 L 120.11 119.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-49" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-50" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,113.72 L 120.11 113.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-51" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,110.64 L 120.11 110.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-52" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,107.56 L 120.11 107.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-53" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,104.48 L 120.11 104.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-54" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-55" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,98.32 L 120.11 98.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-56" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,95.24 L 120.11 95.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-57" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,92.16 L 120.11 92.16" id="fig-bfd50a7b48c642b69caac82982e1df15-element-58" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,89.08 L 120.11 89.08" id="fig-bfd50a7b48c642b69caac82982e1df15-element-59" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-60" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,82.92 L 120.11 82.92" id="fig-bfd50a7b48c642b69caac82982e1df15-element-61" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,79.84 L 120.11 79.84" id="fig-bfd50a7b48c642b69caac82982e1df15-element-62" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,76.76 L 120.11 76.76" id="fig-bfd50a7b48c642b69caac82982e1df15-element-63" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,73.68 L 120.11 73.68" id="fig-bfd50a7b48c642b69caac82982e1df15-element-64" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-65" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,67.52 L 120.11 67.52" id="fig-bfd50a7b48c642b69caac82982e1df15-element-66" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,64.44 L 120.11 64.44" id="fig-bfd50a7b48c642b69caac82982e1df15-element-67" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,61.36 L 120.11 61.36" id="fig-bfd50a7b48c642b69caac82982e1df15-element-68" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,58.28 L 120.11 58.28" id="fig-bfd50a7b48c642b69caac82982e1df15-element-69" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-70" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,52.12 L 120.11 52.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-71" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,49.04 L 120.11 49.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-72" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,45.96 L 120.11 45.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-73" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,42.88 L 120.11 42.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-74" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-75" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,36.72 L 120.11 36.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-76" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,33.64 L 120.11 33.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-77" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,30.56 L 120.11 30.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-78" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,27.48 L 120.11 27.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-79" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-80" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,21.32 L 120.11 21.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-81" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,18.24 L 120.11 18.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-82" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,15.16 L 120.11 15.16" id="fig-bfd50a7b48c642b69caac82982e1df15-element-83" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,12.08 L 120.11 12.08" id="fig-bfd50a7b48c642b69caac82982e1df15-element-84" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-85" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,5.92 L 120.11 5.92" id="fig-bfd50a7b48c642b69caac82982e1df15-element-86" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,2.84 L 120.11 2.84" id="fig-bfd50a7b48c642b69caac82982e1df15-element-87" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-0.24 L 120.11 -0.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-88" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-3.32 L 120.11 -3.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-89" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-90" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-9.48 L 120.11 -9.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-91" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-12.56 L 120.11 -12.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-92" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-15.64 L 120.11 -15.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-93" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-18.72 L 120.11 -18.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-94" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-95" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-24.88 L 120.11 -24.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-96" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-27.96 L 120.11 -27.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-97" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-31.04 L 120.11 -31.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-98" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-34.12 L 120.11 -34.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-99" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-100" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-40.28 L 120.11 -40.28" id="fig-bfd50a7b48c642b69caac82982e1df15-element-101" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-43.36 L 120.11 -43.36" id="fig-bfd50a7b48c642b69caac82982e1df15-element-102" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-46.44 L 120.11 -46.44" id="fig-bfd50a7b48c642b69caac82982e1df15-element-103" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-49.52 L 120.11 -49.52" id="fig-bfd50a7b48c642b69caac82982e1df15-element-104" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-105" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,147.59 L 120.11 147.59" id="fig-bfd50a7b48c642b69caac82982e1df15-element-106" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-107" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-108" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M72.87,-83.4 L 120.11 -83.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-109" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M72.87,132.19 L 120.11 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-110" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,124.5 L 120.11 124.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-111" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,116.8 L 120.11 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-112" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,109.1 L 120.11 109.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-113" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,101.4 L 120.11 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-114" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,93.7 L 120.11 93.7" id="fig-bfd50a7b48c642b69caac82982e1df15-element-115" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,86 L 120.11 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-116" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,78.3 L 120.11 78.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-117" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,70.6 L 120.11 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-118" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,62.9 L 120.11 62.9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-119" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,55.2 L 120.11 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-120" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,47.5 L 120.11 47.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-121" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,39.8 L 120.11 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-122" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,32.1 L 120.11 32.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-123" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,24.4 L 120.11 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-124" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,16.7 L 120.11 16.7" id="fig-bfd50a7b48c642b69caac82982e1df15-element-125" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,9 L 120.11 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-126" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,1.3 L 120.11 1.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-127" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-6.4 L 120.11 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-128" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-14.1 L 120.11 -14.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-129" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-21.8 L 120.11 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-130" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-29.5 L 120.11 -29.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-131" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-37.2 L 120.11 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-132" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-44.9 L 120.11 -44.9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-133" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M72.87,-52.6 L 120.11 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-134" gadfly:scale="5.0" visibility="hidden"/>
         </g>
-        <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-135">
-          <path fill="none" d="M96.49,7 L 96.49 72.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-136" gadfly:scale="1.0"/>
+        <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-bfd50a7b48c642b69caac82982e1df15-element-135">
+          <path fill="none" d="M96.49,7 L 96.49 72.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-136" gadfly:scale="1.0"/>
         </g>
-        <g class="plotpanel" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-137">
-          <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-138">
-            <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-139">
-              <rect x="72.85" y="64.59" width="23.67" height="6.01" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-140" fill="#008000"/>
-              <rect x="96.47" y="59.2" width="23.67" height="11.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-141" fill="#008000"/>
-              <rect x="72.85" y="42.57" width="23.67" height="22.02" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-142" fill="#FF0000"/>
-              <rect x="96.47" y="53.97" width="23.67" height="5.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-143" fill="#FF0000"/>
+        <g class="plotpanel" id="fig-bfd50a7b48c642b69caac82982e1df15-element-137">
+          <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-138">
+            <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-bfd50a7b48c642b69caac82982e1df15-element-139">
+              <rect x="72.85" y="64.59" width="23.67" height="6.01" id="fig-bfd50a7b48c642b69caac82982e1df15-element-140" fill="#008000"/>
+              <rect x="96.47" y="59.2" width="23.67" height="11.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-141" fill="#008000"/>
+              <rect x="72.85" y="42.57" width="23.67" height="22.02" id="fig-bfd50a7b48c642b69caac82982e1df15-element-142" fill="#FF0000"/>
+              <rect x="96.47" y="53.97" width="23.67" height="5.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-143" fill="#FF0000"/>
             </g>
           </g>
         </g>
       </g>
-      <g clip-path="url(#fig-3f54ecb2afae43efb2f60447306cc4db-element-145)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-144">
-        <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-146">
-          <rect x="19.63" y="7" width="49.24" height="65.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-147"/>
+      <g clip-path="url(#fig-bfd50a7b48c642b69caac82982e1df15-element-145)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-144">
+        <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-bfd50a7b48c642b69caac82982e1df15-element-146">
+          <rect x="19.63" y="7" width="49.24" height="65.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-147"/>
         </g>
-        <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-148">
-          <path fill="none" d="M19.63,147.59 L 68.87 147.59" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-149" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-150" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-151" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-152" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-153" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-154" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-155" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-156" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-157" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-158" gadfly:scale="1.0" visibility="visible"/>
-          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-159" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-160" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-161" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-162" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-68 L 68.87 -68" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-163" gadfly:scale="1.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-164" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,129.12 L 68.87 129.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-165" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,126.04 L 68.87 126.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-166" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,122.96 L 68.87 122.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-167" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,119.88 L 68.87 119.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-168" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-169" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,113.72 L 68.87 113.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-170" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,110.64 L 68.87 110.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-171" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,107.56 L 68.87 107.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-172" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,104.48 L 68.87 104.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-173" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-174" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,98.32 L 68.87 98.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-175" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,95.24 L 68.87 95.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-176" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,92.16 L 68.87 92.16" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-177" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,89.08 L 68.87 89.08" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-178" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-179" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,82.92 L 68.87 82.92" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-180" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,79.84 L 68.87 79.84" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-181" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,76.76 L 68.87 76.76" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-182" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,73.68 L 68.87 73.68" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-183" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-184" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,67.52 L 68.87 67.52" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-185" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,64.44 L 68.87 64.44" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-186" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,61.36 L 68.87 61.36" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-187" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,58.28 L 68.87 58.28" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-188" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-189" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,52.12 L 68.87 52.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-190" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,49.04 L 68.87 49.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-191" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,45.96 L 68.87 45.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-192" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,42.88 L 68.87 42.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-193" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-194" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,36.72 L 68.87 36.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-195" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,33.64 L 68.87 33.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-196" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,30.56 L 68.87 30.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-197" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,27.48 L 68.87 27.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-198" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-199" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,21.32 L 68.87 21.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-200" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,18.24 L 68.87 18.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-201" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,15.16 L 68.87 15.16" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-202" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,12.08 L 68.87 12.08" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-203" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-204" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,5.92 L 68.87 5.92" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-205" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,2.84 L 68.87 2.84" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-206" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-0.24 L 68.87 -0.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-207" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-3.32 L 68.87 -3.32" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-208" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-209" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-9.48 L 68.87 -9.48" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-210" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-12.56 L 68.87 -12.56" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-211" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-15.64 L 68.87 -15.64" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-212" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-18.72 L 68.87 -18.72" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-213" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-214" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-24.88 L 68.87 -24.88" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-215" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-27.96 L 68.87 -27.96" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-216" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-31.04 L 68.87 -31.04" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-217" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-34.12 L 68.87 -34.12" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-218" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-219" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-40.28 L 68.87 -40.28" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-220" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-43.36 L 68.87 -43.36" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-221" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-46.44 L 68.87 -46.44" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-222" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-49.52 L 68.87 -49.52" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-223" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-224" gadfly:scale="10.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,147.59 L 68.87 147.59" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-225" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-226" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-227" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M19.63,-83.4 L 68.87 -83.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-228" gadfly:scale="0.5" visibility="hidden"/>
-          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-229" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,124.5 L 68.87 124.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-230" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-231" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,109.1 L 68.87 109.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-232" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-233" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,93.7 L 68.87 93.7" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-234" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-235" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,78.3 L 68.87 78.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-236" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-237" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,62.9 L 68.87 62.9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-238" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-239" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,47.5 L 68.87 47.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-240" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-241" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,32.1 L 68.87 32.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-242" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-243" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,16.7 L 68.87 16.7" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-244" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-245" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,1.3 L 68.87 1.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-246" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-247" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-14.1 L 68.87 -14.1" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-248" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-249" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-29.5 L 68.87 -29.5" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-250" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-251" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-44.9 L 68.87 -44.9" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-252" gadfly:scale="5.0" visibility="hidden"/>
-          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-253" gadfly:scale="5.0" visibility="hidden"/>
+        <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-bfd50a7b48c642b69caac82982e1df15-element-148">
+          <path fill="none" d="M19.63,147.59 L 68.87 147.59" id="fig-bfd50a7b48c642b69caac82982e1df15-element-149" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-150" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-151" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-152" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-153" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-154" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-155" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-156" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-157" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-158" gadfly:scale="1.0" visibility="visible"/>
+          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-159" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-160" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-161" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-162" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-68 L 68.87 -68" id="fig-bfd50a7b48c642b69caac82982e1df15-element-163" gadfly:scale="1.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-164" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,129.12 L 68.87 129.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-165" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,126.04 L 68.87 126.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-166" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,122.96 L 68.87 122.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-167" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,119.88 L 68.87 119.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-168" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-169" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,113.72 L 68.87 113.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-170" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,110.64 L 68.87 110.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-171" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,107.56 L 68.87 107.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-172" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,104.48 L 68.87 104.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-173" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-174" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,98.32 L 68.87 98.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-175" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,95.24 L 68.87 95.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-176" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,92.16 L 68.87 92.16" id="fig-bfd50a7b48c642b69caac82982e1df15-element-177" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,89.08 L 68.87 89.08" id="fig-bfd50a7b48c642b69caac82982e1df15-element-178" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-179" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,82.92 L 68.87 82.92" id="fig-bfd50a7b48c642b69caac82982e1df15-element-180" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,79.84 L 68.87 79.84" id="fig-bfd50a7b48c642b69caac82982e1df15-element-181" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,76.76 L 68.87 76.76" id="fig-bfd50a7b48c642b69caac82982e1df15-element-182" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,73.68 L 68.87 73.68" id="fig-bfd50a7b48c642b69caac82982e1df15-element-183" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-184" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,67.52 L 68.87 67.52" id="fig-bfd50a7b48c642b69caac82982e1df15-element-185" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,64.44 L 68.87 64.44" id="fig-bfd50a7b48c642b69caac82982e1df15-element-186" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,61.36 L 68.87 61.36" id="fig-bfd50a7b48c642b69caac82982e1df15-element-187" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,58.28 L 68.87 58.28" id="fig-bfd50a7b48c642b69caac82982e1df15-element-188" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-189" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,52.12 L 68.87 52.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-190" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,49.04 L 68.87 49.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-191" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,45.96 L 68.87 45.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-192" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,42.88 L 68.87 42.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-193" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-194" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,36.72 L 68.87 36.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-195" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,33.64 L 68.87 33.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-196" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,30.56 L 68.87 30.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-197" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,27.48 L 68.87 27.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-198" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-199" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,21.32 L 68.87 21.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-200" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,18.24 L 68.87 18.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-201" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,15.16 L 68.87 15.16" id="fig-bfd50a7b48c642b69caac82982e1df15-element-202" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,12.08 L 68.87 12.08" id="fig-bfd50a7b48c642b69caac82982e1df15-element-203" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-204" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,5.92 L 68.87 5.92" id="fig-bfd50a7b48c642b69caac82982e1df15-element-205" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,2.84 L 68.87 2.84" id="fig-bfd50a7b48c642b69caac82982e1df15-element-206" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-0.24 L 68.87 -0.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-207" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-3.32 L 68.87 -3.32" id="fig-bfd50a7b48c642b69caac82982e1df15-element-208" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-209" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-9.48 L 68.87 -9.48" id="fig-bfd50a7b48c642b69caac82982e1df15-element-210" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-12.56 L 68.87 -12.56" id="fig-bfd50a7b48c642b69caac82982e1df15-element-211" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-15.64 L 68.87 -15.64" id="fig-bfd50a7b48c642b69caac82982e1df15-element-212" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-18.72 L 68.87 -18.72" id="fig-bfd50a7b48c642b69caac82982e1df15-element-213" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-214" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-24.88 L 68.87 -24.88" id="fig-bfd50a7b48c642b69caac82982e1df15-element-215" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-27.96 L 68.87 -27.96" id="fig-bfd50a7b48c642b69caac82982e1df15-element-216" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-31.04 L 68.87 -31.04" id="fig-bfd50a7b48c642b69caac82982e1df15-element-217" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-34.12 L 68.87 -34.12" id="fig-bfd50a7b48c642b69caac82982e1df15-element-218" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-219" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-40.28 L 68.87 -40.28" id="fig-bfd50a7b48c642b69caac82982e1df15-element-220" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-43.36 L 68.87 -43.36" id="fig-bfd50a7b48c642b69caac82982e1df15-element-221" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-46.44 L 68.87 -46.44" id="fig-bfd50a7b48c642b69caac82982e1df15-element-222" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-49.52 L 68.87 -49.52" id="fig-bfd50a7b48c642b69caac82982e1df15-element-223" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-224" gadfly:scale="10.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,147.59 L 68.87 147.59" id="fig-bfd50a7b48c642b69caac82982e1df15-element-225" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-226" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-227" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M19.63,-83.4 L 68.87 -83.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-228" gadfly:scale="0.5" visibility="hidden"/>
+          <path fill="none" d="M19.63,132.19 L 68.87 132.19" id="fig-bfd50a7b48c642b69caac82982e1df15-element-229" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,124.5 L 68.87 124.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-230" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,116.8 L 68.87 116.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-231" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,109.1 L 68.87 109.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-232" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,101.4 L 68.87 101.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-233" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,93.7 L 68.87 93.7" id="fig-bfd50a7b48c642b69caac82982e1df15-element-234" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,86 L 68.87 86" id="fig-bfd50a7b48c642b69caac82982e1df15-element-235" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,78.3 L 68.87 78.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-236" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,70.6 L 68.87 70.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-237" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,62.9 L 68.87 62.9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-238" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,55.2 L 68.87 55.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-239" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,47.5 L 68.87 47.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-240" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,39.8 L 68.87 39.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-241" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,32.1 L 68.87 32.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-242" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,24.4 L 68.87 24.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-243" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,16.7 L 68.87 16.7" id="fig-bfd50a7b48c642b69caac82982e1df15-element-244" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,9 L 68.87 9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-245" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,1.3 L 68.87 1.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-246" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-6.4 L 68.87 -6.4" id="fig-bfd50a7b48c642b69caac82982e1df15-element-247" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-14.1 L 68.87 -14.1" id="fig-bfd50a7b48c642b69caac82982e1df15-element-248" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-21.8 L 68.87 -21.8" id="fig-bfd50a7b48c642b69caac82982e1df15-element-249" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-29.5 L 68.87 -29.5" id="fig-bfd50a7b48c642b69caac82982e1df15-element-250" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-37.2 L 68.87 -37.2" id="fig-bfd50a7b48c642b69caac82982e1df15-element-251" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-44.9 L 68.87 -44.9" id="fig-bfd50a7b48c642b69caac82982e1df15-element-252" gadfly:scale="5.0" visibility="hidden"/>
+          <path fill="none" d="M19.63,-52.6 L 68.87 -52.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-253" gadfly:scale="5.0" visibility="hidden"/>
         </g>
-        <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-254">
-          <path fill="none" d="M44.25,7 L 44.25 72.6" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-255" gadfly:scale="1.0"/>
+        <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" visibility="visible" id="fig-bfd50a7b48c642b69caac82982e1df15-element-254">
+          <path fill="none" d="M44.25,7 L 44.25 72.6" id="fig-bfd50a7b48c642b69caac82982e1df15-element-255" gadfly:scale="1.0"/>
         </g>
-        <g class="plotpanel" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-256">
-          <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-257">
-            <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-258">
-              <rect x="19.61" y="59.82" width="24.67" height="10.78" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-259" fill="#008000"/>
-              <rect x="44.23" y="46.11" width="24.67" height="24.49" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-260" fill="#008000"/>
-              <rect x="19.61" y="9.77" width="24.67" height="50.05" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-261" fill="#FF0000"/>
-              <rect x="44.23" y="38.87" width="24.67" height="7.24" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-262" fill="#FF0000"/>
+        <g class="plotpanel" id="fig-bfd50a7b48c642b69caac82982e1df15-element-256">
+          <g shape-rendering="crispEdges" stroke-width="0.3" id="fig-bfd50a7b48c642b69caac82982e1df15-element-257">
+            <g stroke="#000000" stroke-opacity="0.000" class="geometry" id="fig-bfd50a7b48c642b69caac82982e1df15-element-258">
+              <rect x="19.61" y="59.82" width="24.67" height="10.78" id="fig-bfd50a7b48c642b69caac82982e1df15-element-259" fill="#008000"/>
+              <rect x="44.23" y="46.11" width="24.67" height="24.49" id="fig-bfd50a7b48c642b69caac82982e1df15-element-260" fill="#008000"/>
+              <rect x="19.61" y="9.77" width="24.67" height="50.05" id="fig-bfd50a7b48c642b69caac82982e1df15-element-261" fill="#FF0000"/>
+              <rect x="44.23" y="38.87" width="24.67" height="7.24" id="fig-bfd50a7b48c642b69caac82982e1df15-element-262" fill="#FF0000"/>
             </g>
           </g>
         </g>
       </g>
-      <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-263">
-        <text x="18.63" y="147.59" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-264" gadfly:scale="1.0" visibility="hidden">-500</text>
-        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-265" gadfly:scale="1.0" visibility="hidden">-400</text>
-        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-266" gadfly:scale="1.0" visibility="hidden">-300</text>
-        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-267" gadfly:scale="1.0" visibility="hidden">-200</text>
-        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-268" gadfly:scale="1.0" visibility="hidden">-100</text>
-        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-269" gadfly:scale="1.0" visibility="visible">0</text>
-        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-270" gadfly:scale="1.0" visibility="visible">100</text>
-        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-271" gadfly:scale="1.0" visibility="visible">200</text>
-        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-272" gadfly:scale="1.0" visibility="visible">300</text>
-        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-273" gadfly:scale="1.0" visibility="visible">400</text>
-        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-274" gadfly:scale="1.0" visibility="hidden">500</text>
-        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-275" gadfly:scale="1.0" visibility="hidden">600</text>
-        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-276" gadfly:scale="1.0" visibility="hidden">700</text>
-        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-277" gadfly:scale="1.0" visibility="hidden">800</text>
-        <text x="18.63" y="-68" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-278" gadfly:scale="1.0" visibility="hidden">900</text>
-        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-279" gadfly:scale="10.0" visibility="hidden">-400</text>
-        <text x="18.63" y="129.12" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-280" gadfly:scale="10.0" visibility="hidden">-380</text>
-        <text x="18.63" y="126.04" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-281" gadfly:scale="10.0" visibility="hidden">-360</text>
-        <text x="18.63" y="122.96" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-282" gadfly:scale="10.0" visibility="hidden">-340</text>
-        <text x="18.63" y="119.88" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-283" gadfly:scale="10.0" visibility="hidden">-320</text>
-        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-284" gadfly:scale="10.0" visibility="hidden">-300</text>
-        <text x="18.63" y="113.72" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-285" gadfly:scale="10.0" visibility="hidden">-280</text>
-        <text x="18.63" y="110.64" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-286" gadfly:scale="10.0" visibility="hidden">-260</text>
-        <text x="18.63" y="107.56" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-287" gadfly:scale="10.0" visibility="hidden">-240</text>
-        <text x="18.63" y="104.48" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-288" gadfly:scale="10.0" visibility="hidden">-220</text>
-        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-289" gadfly:scale="10.0" visibility="hidden">-200</text>
-        <text x="18.63" y="98.32" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-290" gadfly:scale="10.0" visibility="hidden">-180</text>
-        <text x="18.63" y="95.24" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-291" gadfly:scale="10.0" visibility="hidden">-160</text>
-        <text x="18.63" y="92.16" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-292" gadfly:scale="10.0" visibility="hidden">-140</text>
-        <text x="18.63" y="89.08" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-293" gadfly:scale="10.0" visibility="hidden">-120</text>
-        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-294" gadfly:scale="10.0" visibility="hidden">-100</text>
-        <text x="18.63" y="82.92" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-295" gadfly:scale="10.0" visibility="hidden">-80</text>
-        <text x="18.63" y="79.84" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-296" gadfly:scale="10.0" visibility="hidden">-60</text>
-        <text x="18.63" y="76.76" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-297" gadfly:scale="10.0" visibility="hidden">-40</text>
-        <text x="18.63" y="73.68" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-298" gadfly:scale="10.0" visibility="hidden">-20</text>
-        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-299" gadfly:scale="10.0" visibility="hidden">0</text>
-        <text x="18.63" y="67.52" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-300" gadfly:scale="10.0" visibility="hidden">20</text>
-        <text x="18.63" y="64.44" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-301" gadfly:scale="10.0" visibility="hidden">40</text>
-        <text x="18.63" y="61.36" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-302" gadfly:scale="10.0" visibility="hidden">60</text>
-        <text x="18.63" y="58.28" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-303" gadfly:scale="10.0" visibility="hidden">80</text>
-        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-304" gadfly:scale="10.0" visibility="hidden">100</text>
-        <text x="18.63" y="52.12" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-305" gadfly:scale="10.0" visibility="hidden">120</text>
-        <text x="18.63" y="49.04" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-306" gadfly:scale="10.0" visibility="hidden">140</text>
-        <text x="18.63" y="45.96" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-307" gadfly:scale="10.0" visibility="hidden">160</text>
-        <text x="18.63" y="42.88" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-308" gadfly:scale="10.0" visibility="hidden">180</text>
-        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-309" gadfly:scale="10.0" visibility="hidden">200</text>
-        <text x="18.63" y="36.72" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-310" gadfly:scale="10.0" visibility="hidden">220</text>
-        <text x="18.63" y="33.64" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-311" gadfly:scale="10.0" visibility="hidden">240</text>
-        <text x="18.63" y="30.56" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-312" gadfly:scale="10.0" visibility="hidden">260</text>
-        <text x="18.63" y="27.48" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-313" gadfly:scale="10.0" visibility="hidden">280</text>
-        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-314" gadfly:scale="10.0" visibility="hidden">300</text>
-        <text x="18.63" y="21.32" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-315" gadfly:scale="10.0" visibility="hidden">320</text>
-        <text x="18.63" y="18.24" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-316" gadfly:scale="10.0" visibility="hidden">340</text>
-        <text x="18.63" y="15.16" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-317" gadfly:scale="10.0" visibility="hidden">360</text>
-        <text x="18.63" y="12.08" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-318" gadfly:scale="10.0" visibility="hidden">380</text>
-        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-319" gadfly:scale="10.0" visibility="hidden">400</text>
-        <text x="18.63" y="5.92" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-320" gadfly:scale="10.0" visibility="hidden">420</text>
-        <text x="18.63" y="2.84" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-321" gadfly:scale="10.0" visibility="hidden">440</text>
-        <text x="18.63" y="-0.24" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-322" gadfly:scale="10.0" visibility="hidden">460</text>
-        <text x="18.63" y="-3.32" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-323" gadfly:scale="10.0" visibility="hidden">480</text>
-        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-324" gadfly:scale="10.0" visibility="hidden">500</text>
-        <text x="18.63" y="-9.48" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-325" gadfly:scale="10.0" visibility="hidden">520</text>
-        <text x="18.63" y="-12.56" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-326" gadfly:scale="10.0" visibility="hidden">540</text>
-        <text x="18.63" y="-15.64" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-327" gadfly:scale="10.0" visibility="hidden">560</text>
-        <text x="18.63" y="-18.72" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-328" gadfly:scale="10.0" visibility="hidden">580</text>
-        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-329" gadfly:scale="10.0" visibility="hidden">600</text>
-        <text x="18.63" y="-24.88" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-330" gadfly:scale="10.0" visibility="hidden">620</text>
-        <text x="18.63" y="-27.96" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-331" gadfly:scale="10.0" visibility="hidden">640</text>
-        <text x="18.63" y="-31.04" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-332" gadfly:scale="10.0" visibility="hidden">660</text>
-        <text x="18.63" y="-34.12" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-333" gadfly:scale="10.0" visibility="hidden">680</text>
-        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-334" gadfly:scale="10.0" visibility="hidden">700</text>
-        <text x="18.63" y="-40.28" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-335" gadfly:scale="10.0" visibility="hidden">720</text>
-        <text x="18.63" y="-43.36" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-336" gadfly:scale="10.0" visibility="hidden">740</text>
-        <text x="18.63" y="-46.44" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-337" gadfly:scale="10.0" visibility="hidden">760</text>
-        <text x="18.63" y="-49.52" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-338" gadfly:scale="10.0" visibility="hidden">780</text>
-        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-339" gadfly:scale="10.0" visibility="hidden">800</text>
-        <text x="18.63" y="147.59" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-340" gadfly:scale="0.5" visibility="hidden">-500</text>
-        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-341" gadfly:scale="0.5" visibility="hidden">0</text>
-        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-342" gadfly:scale="0.5" visibility="hidden">500</text>
-        <text x="18.63" y="-83.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-343" gadfly:scale="0.5" visibility="hidden">1000</text>
-        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-344" gadfly:scale="5.0" visibility="hidden">-400</text>
-        <text x="18.63" y="124.5" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-345" gadfly:scale="5.0" visibility="hidden">-350</text>
-        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-346" gadfly:scale="5.0" visibility="hidden">-300</text>
-        <text x="18.63" y="109.1" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-347" gadfly:scale="5.0" visibility="hidden">-250</text>
-        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-348" gadfly:scale="5.0" visibility="hidden">-200</text>
-        <text x="18.63" y="93.7" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-349" gadfly:scale="5.0" visibility="hidden">-150</text>
-        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-350" gadfly:scale="5.0" visibility="hidden">-100</text>
-        <text x="18.63" y="78.3" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-351" gadfly:scale="5.0" visibility="hidden">-50</text>
-        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-352" gadfly:scale="5.0" visibility="hidden">0</text>
-        <text x="18.63" y="62.9" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-353" gadfly:scale="5.0" visibility="hidden">50</text>
-        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-354" gadfly:scale="5.0" visibility="hidden">100</text>
-        <text x="18.63" y="47.5" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-355" gadfly:scale="5.0" visibility="hidden">150</text>
-        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-356" gadfly:scale="5.0" visibility="hidden">200</text>
-        <text x="18.63" y="32.1" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-357" gadfly:scale="5.0" visibility="hidden">250</text>
-        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-358" gadfly:scale="5.0" visibility="hidden">300</text>
-        <text x="18.63" y="16.7" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-359" gadfly:scale="5.0" visibility="hidden">350</text>
-        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-360" gadfly:scale="5.0" visibility="hidden">400</text>
-        <text x="18.63" y="1.3" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-361" gadfly:scale="5.0" visibility="hidden">450</text>
-        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-362" gadfly:scale="5.0" visibility="hidden">500</text>
-        <text x="18.63" y="-14.1" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-363" gadfly:scale="5.0" visibility="hidden">550</text>
-        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-364" gadfly:scale="5.0" visibility="hidden">600</text>
-        <text x="18.63" y="-29.5" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-365" gadfly:scale="5.0" visibility="hidden">650</text>
-        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-366" gadfly:scale="5.0" visibility="hidden">700</text>
-        <text x="18.63" y="-44.9" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-367" gadfly:scale="5.0" visibility="hidden">750</text>
-        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-368" gadfly:scale="5.0" visibility="hidden">800</text>
+      <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-bfd50a7b48c642b69caac82982e1df15-element-263">
+        <text x="18.63" y="147.59" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-264" gadfly:scale="1.0" visibility="hidden">-500</text>
+        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-265" gadfly:scale="1.0" visibility="hidden">-400</text>
+        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-266" gadfly:scale="1.0" visibility="hidden">-300</text>
+        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-267" gadfly:scale="1.0" visibility="hidden">-200</text>
+        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-268" gadfly:scale="1.0" visibility="hidden">-100</text>
+        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-269" gadfly:scale="1.0" visibility="visible">0</text>
+        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-270" gadfly:scale="1.0" visibility="visible">100</text>
+        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-271" gadfly:scale="1.0" visibility="visible">200</text>
+        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-272" gadfly:scale="1.0" visibility="visible">300</text>
+        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-273" gadfly:scale="1.0" visibility="visible">400</text>
+        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-274" gadfly:scale="1.0" visibility="hidden">500</text>
+        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-275" gadfly:scale="1.0" visibility="hidden">600</text>
+        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-276" gadfly:scale="1.0" visibility="hidden">700</text>
+        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-277" gadfly:scale="1.0" visibility="hidden">800</text>
+        <text x="18.63" y="-68" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-278" gadfly:scale="1.0" visibility="hidden">900</text>
+        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-279" gadfly:scale="10.0" visibility="hidden">-400</text>
+        <text x="18.63" y="129.12" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-280" gadfly:scale="10.0" visibility="hidden">-380</text>
+        <text x="18.63" y="126.04" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-281" gadfly:scale="10.0" visibility="hidden">-360</text>
+        <text x="18.63" y="122.96" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-282" gadfly:scale="10.0" visibility="hidden">-340</text>
+        <text x="18.63" y="119.88" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-283" gadfly:scale="10.0" visibility="hidden">-320</text>
+        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-284" gadfly:scale="10.0" visibility="hidden">-300</text>
+        <text x="18.63" y="113.72" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-285" gadfly:scale="10.0" visibility="hidden">-280</text>
+        <text x="18.63" y="110.64" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-286" gadfly:scale="10.0" visibility="hidden">-260</text>
+        <text x="18.63" y="107.56" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-287" gadfly:scale="10.0" visibility="hidden">-240</text>
+        <text x="18.63" y="104.48" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-288" gadfly:scale="10.0" visibility="hidden">-220</text>
+        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-289" gadfly:scale="10.0" visibility="hidden">-200</text>
+        <text x="18.63" y="98.32" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-290" gadfly:scale="10.0" visibility="hidden">-180</text>
+        <text x="18.63" y="95.24" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-291" gadfly:scale="10.0" visibility="hidden">-160</text>
+        <text x="18.63" y="92.16" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-292" gadfly:scale="10.0" visibility="hidden">-140</text>
+        <text x="18.63" y="89.08" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-293" gadfly:scale="10.0" visibility="hidden">-120</text>
+        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-294" gadfly:scale="10.0" visibility="hidden">-100</text>
+        <text x="18.63" y="82.92" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-295" gadfly:scale="10.0" visibility="hidden">-80</text>
+        <text x="18.63" y="79.84" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-296" gadfly:scale="10.0" visibility="hidden">-60</text>
+        <text x="18.63" y="76.76" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-297" gadfly:scale="10.0" visibility="hidden">-40</text>
+        <text x="18.63" y="73.68" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-298" gadfly:scale="10.0" visibility="hidden">-20</text>
+        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-299" gadfly:scale="10.0" visibility="hidden">0</text>
+        <text x="18.63" y="67.52" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-300" gadfly:scale="10.0" visibility="hidden">20</text>
+        <text x="18.63" y="64.44" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-301" gadfly:scale="10.0" visibility="hidden">40</text>
+        <text x="18.63" y="61.36" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-302" gadfly:scale="10.0" visibility="hidden">60</text>
+        <text x="18.63" y="58.28" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-303" gadfly:scale="10.0" visibility="hidden">80</text>
+        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-304" gadfly:scale="10.0" visibility="hidden">100</text>
+        <text x="18.63" y="52.12" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-305" gadfly:scale="10.0" visibility="hidden">120</text>
+        <text x="18.63" y="49.04" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-306" gadfly:scale="10.0" visibility="hidden">140</text>
+        <text x="18.63" y="45.96" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-307" gadfly:scale="10.0" visibility="hidden">160</text>
+        <text x="18.63" y="42.88" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-308" gadfly:scale="10.0" visibility="hidden">180</text>
+        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-309" gadfly:scale="10.0" visibility="hidden">200</text>
+        <text x="18.63" y="36.72" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-310" gadfly:scale="10.0" visibility="hidden">220</text>
+        <text x="18.63" y="33.64" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-311" gadfly:scale="10.0" visibility="hidden">240</text>
+        <text x="18.63" y="30.56" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-312" gadfly:scale="10.0" visibility="hidden">260</text>
+        <text x="18.63" y="27.48" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-313" gadfly:scale="10.0" visibility="hidden">280</text>
+        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-314" gadfly:scale="10.0" visibility="hidden">300</text>
+        <text x="18.63" y="21.32" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-315" gadfly:scale="10.0" visibility="hidden">320</text>
+        <text x="18.63" y="18.24" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-316" gadfly:scale="10.0" visibility="hidden">340</text>
+        <text x="18.63" y="15.16" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-317" gadfly:scale="10.0" visibility="hidden">360</text>
+        <text x="18.63" y="12.08" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-318" gadfly:scale="10.0" visibility="hidden">380</text>
+        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-319" gadfly:scale="10.0" visibility="hidden">400</text>
+        <text x="18.63" y="5.92" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-320" gadfly:scale="10.0" visibility="hidden">420</text>
+        <text x="18.63" y="2.84" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-321" gadfly:scale="10.0" visibility="hidden">440</text>
+        <text x="18.63" y="-0.24" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-322" gadfly:scale="10.0" visibility="hidden">460</text>
+        <text x="18.63" y="-3.32" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-323" gadfly:scale="10.0" visibility="hidden">480</text>
+        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-324" gadfly:scale="10.0" visibility="hidden">500</text>
+        <text x="18.63" y="-9.48" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-325" gadfly:scale="10.0" visibility="hidden">520</text>
+        <text x="18.63" y="-12.56" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-326" gadfly:scale="10.0" visibility="hidden">540</text>
+        <text x="18.63" y="-15.64" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-327" gadfly:scale="10.0" visibility="hidden">560</text>
+        <text x="18.63" y="-18.72" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-328" gadfly:scale="10.0" visibility="hidden">580</text>
+        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-329" gadfly:scale="10.0" visibility="hidden">600</text>
+        <text x="18.63" y="-24.88" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-330" gadfly:scale="10.0" visibility="hidden">620</text>
+        <text x="18.63" y="-27.96" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-331" gadfly:scale="10.0" visibility="hidden">640</text>
+        <text x="18.63" y="-31.04" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-332" gadfly:scale="10.0" visibility="hidden">660</text>
+        <text x="18.63" y="-34.12" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-333" gadfly:scale="10.0" visibility="hidden">680</text>
+        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-334" gadfly:scale="10.0" visibility="hidden">700</text>
+        <text x="18.63" y="-40.28" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-335" gadfly:scale="10.0" visibility="hidden">720</text>
+        <text x="18.63" y="-43.36" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-336" gadfly:scale="10.0" visibility="hidden">740</text>
+        <text x="18.63" y="-46.44" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-337" gadfly:scale="10.0" visibility="hidden">760</text>
+        <text x="18.63" y="-49.52" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-338" gadfly:scale="10.0" visibility="hidden">780</text>
+        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-339" gadfly:scale="10.0" visibility="hidden">800</text>
+        <text x="18.63" y="147.59" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-340" gadfly:scale="0.5" visibility="hidden">-500</text>
+        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-341" gadfly:scale="0.5" visibility="hidden">0</text>
+        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-342" gadfly:scale="0.5" visibility="hidden">500</text>
+        <text x="18.63" y="-83.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-343" gadfly:scale="0.5" visibility="hidden">1000</text>
+        <text x="18.63" y="132.19" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-344" gadfly:scale="5.0" visibility="hidden">-400</text>
+        <text x="18.63" y="124.5" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-345" gadfly:scale="5.0" visibility="hidden">-350</text>
+        <text x="18.63" y="116.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-346" gadfly:scale="5.0" visibility="hidden">-300</text>
+        <text x="18.63" y="109.1" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-347" gadfly:scale="5.0" visibility="hidden">-250</text>
+        <text x="18.63" y="101.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-348" gadfly:scale="5.0" visibility="hidden">-200</text>
+        <text x="18.63" y="93.7" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-349" gadfly:scale="5.0" visibility="hidden">-150</text>
+        <text x="18.63" y="86" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-350" gadfly:scale="5.0" visibility="hidden">-100</text>
+        <text x="18.63" y="78.3" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-351" gadfly:scale="5.0" visibility="hidden">-50</text>
+        <text x="18.63" y="70.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-352" gadfly:scale="5.0" visibility="hidden">0</text>
+        <text x="18.63" y="62.9" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-353" gadfly:scale="5.0" visibility="hidden">50</text>
+        <text x="18.63" y="55.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-354" gadfly:scale="5.0" visibility="hidden">100</text>
+        <text x="18.63" y="47.5" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-355" gadfly:scale="5.0" visibility="hidden">150</text>
+        <text x="18.63" y="39.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-356" gadfly:scale="5.0" visibility="hidden">200</text>
+        <text x="18.63" y="32.1" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-357" gadfly:scale="5.0" visibility="hidden">250</text>
+        <text x="18.63" y="24.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-358" gadfly:scale="5.0" visibility="hidden">300</text>
+        <text x="18.63" y="16.7" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-359" gadfly:scale="5.0" visibility="hidden">350</text>
+        <text x="18.63" y="9" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-360" gadfly:scale="5.0" visibility="hidden">400</text>
+        <text x="18.63" y="1.3" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-361" gadfly:scale="5.0" visibility="hidden">450</text>
+        <text x="18.63" y="-6.4" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-362" gadfly:scale="5.0" visibility="hidden">500</text>
+        <text x="18.63" y="-14.1" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-363" gadfly:scale="5.0" visibility="hidden">550</text>
+        <text x="18.63" y="-21.8" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-364" gadfly:scale="5.0" visibility="hidden">600</text>
+        <text x="18.63" y="-29.5" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-365" gadfly:scale="5.0" visibility="hidden">650</text>
+        <text x="18.63" y="-37.2" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-366" gadfly:scale="5.0" visibility="hidden">700</text>
+        <text x="18.63" y="-44.9" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-367" gadfly:scale="5.0" visibility="hidden">750</text>
+        <text x="18.63" y="-52.6" text-anchor="end" dy="0.35em" id="fig-bfd50a7b48c642b69caac82982e1df15-element-368" gadfly:scale="5.0" visibility="hidden">800</text>
       </g>
     </g>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-369">
-    <text x="8.81" y="43.19" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 45.19)" id="fig-3f54ecb2afae43efb2f60447306cc4db-element-370">Survived</text>
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-bfd50a7b48c642b69caac82982e1df15-element-369">
+    <text x="8.81" y="43.19" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 45.19)" id="fig-bfd50a7b48c642b69caac82982e1df15-element-370">Survived</text>
   </g>
 </g>
 <defs>
-<clipPath id="fig-3f54ecb2afae43efb2f60447306cc4db-element-13">
+<clipPath id="fig-bfd50a7b48c642b69caac82982e1df15-element-13">
   <path d="M12.61,5 L 122.11 5 122.11 85.39 12.61 85.39" />
 </clipPath
-><clipPath id="fig-3f54ecb2afae43efb2f60447306cc4db-element-145">
-  <path d="M19.63,7 L 68.87 7 68.87 72.6 19.63 72.6" />
-</clipPath
-><clipPath id="fig-3f54ecb2afae43efb2f60447306cc4db-element-26">
+><clipPath id="fig-bfd50a7b48c642b69caac82982e1df15-element-26">
   <path d="M72.87,7 L 120.11 7 120.11 72.6 72.87 72.6" />
+</clipPath
+><clipPath id="fig-bfd50a7b48c642b69caac82982e1df15-element-145">
+  <path d="M19.63,7 L 68.87 7 68.87 72.6 19.63 72.6" />
 </clipPath
 ></defs>
 <script> <![CDATA[
@@ -4827,26 +4734,26 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-3f54ecb2afae43efb2f60447306cc4db");
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-3")
+    var fig = Snap("#fig-bfd50a7b48c642b69caac82982e1df15");
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-3")
    .drag(function() {}, function() {}, function() {});
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-5")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-5")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-6")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-6")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-8")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-8")
    .data("color_class", "color_0")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-9")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-9")
    .data("color_class", "color_1")
 .click(Gadfly.colorkey_swatch_click)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-12")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-12")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -4854,7 +4761,7 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-12")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-25")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-25")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -4862,19 +4769,19 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-25")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-29")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-29")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-29")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-29")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-135")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-135")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-135")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-135")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-144")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-144")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -4882,16 +4789,16 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-144")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-148")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-148")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-148")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-148")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-254")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
+fig.select("#fig-bfd50a7b48c642b69caac82982e1df15-element-254")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
     });
@@ -4901,31 +4808,72 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
 
+These kind of visual analysis is a powerful tool to perform the initial data mining before diving into any deeper machine learning algorithms for predictions.
+
+We clearly see that Age and Gender influence the survival. But we cannot generate all combinations to create a ifelse model for prediction. Enter DecisionTrees. Decision trees do exactly what we did with Gender but at a larger scale where all dimensions (or features) are invovled in forming the decision tree.  
+In our case the decision we need to make is Survived or Not.
+
+Before doing that we need to handle the missing data in our feature variables. There are multiple ways to handle missing data and we wont go deeper into them. We will use a simple technique of filling the missing value with 
+
+1. Mean value if the variable is numeric.
+2. Max frequency categorical variable value for categorical variables.
+
+
+    countmap(train[:Embarked])
+
+
+
+
+    Dict{Union(NAtype,UTF8String),Int64} with 4 entries:
+      "Q" => 77
+      "S" => 644
+      "C" => 168
+      NA  => 2
+
+
+
+
+    train[isna(train[:Embarked]), :Embarked] = "S"
+
+
+
+
+    "S"
+
+
+
+
+    meanAge = mean(train[!isna(train[:Age]), :Age])
+
+
+
+
+    29.69911764705882
+
+
+
+
+    train[isna(train[:Age]), :Age] = meanAge
+
+
+
+
+    29.69911764705882
+
+
+
+Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
+We will be using the ``DecisionTree``` julia package.  
+Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
+
 
     using DecisionTree
 
 
-    #array does not like NAs so we need some preprocessing
-    #countmap(train[:Embarked])
-    train[isna(train[:Embarked]), :Embarked] = "X"
-    train[isna(train[:Age]), :Age] = 0
-    #labels = colwise(float64, train[[:Age, :SibSp, :Parch, :Fare]])
-    #features = Vector(train[:Survived])
-    #labels
     train[:Age] = float64(train[:Age])
     train[:Fare] = float64(train[:Fare])
     features = array(train[:,[:Pclass, :Sex, :Age, :SibSp, :Parch, :Fare, :Embarked, :Child]])
-    #labels=int2string(array(train[:Survived])) #, int2string)
     labels=array(train[:Survived])
-
-    WARNING: array(da::DataArray{T}) is deprecated.
-    Use convert(Array, da).
-     in array at /Users/ajkale/.julia/v0.3/DataArrays/src/deprecated.jl:23
-     in include_string at loading.jl:97
-     in execute_request_0x535c5df2 at /Users/ajkale/.julia/v0.3/IJulia/src/execute_request.jl:157
-     in eventloop at /Users/ajkale/.julia/v0.3/IJulia/src/IJulia.jl:123
-     in anonymous at task.jl:340
-
 
 
 
@@ -4967,34 +4915,37 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     891x8 Array{Any,2}:
-     3  "male"    22.0  1  0   7.25    "S"  0
-     1  "female"  38.0  1  0  71.2833  "C"  0
-     3  "female"  26.0  0  0   7.925   "S"  0
-     1  "female"  35.0  1  0  53.1     "S"  0
-     3  "male"    35.0  0  0   8.05    "S"  0
-     3  "male"     0.0  0  0   8.4583  "Q"  1
-     1  "male"    54.0  0  0  51.8625  "S"  0
-     3  "male"     2.0  3  1  21.075   "S"  1
-     3  "female"  27.0  0  2  11.1333  "S"  0
-     2  "female"  14.0  1  0  30.0708  "C"  1
-     3  "female"   4.0  1  1  16.7     "S"  1
-     1  "female"  58.0  0  0  26.55    "S"  0
-     3  "male"    20.0  0  0   8.05    "S"  0
-     ⋮                         ⋮             
-     1  "female"  56.0  0  1  83.1583  "C"  0
-     2  "female"  25.0  0  1  26.0     "S"  0
-     3  "male"    33.0  0  0   7.8958  "S"  0
-     3  "female"  22.0  0  0  10.5167  "S"  0
-     2  "male"    28.0  0  0  10.5     "S"  0
-     3  "male"    25.0  0  0   7.05    "S"  0
-     3  "female"  39.0  0  5  29.125   "Q"  0
-     2  "male"    27.0  0  0  13.0     "S"  0
-     1  "female"  19.0  0  0  30.0     "S"  0
-     3  "female"   0.0  1  2  23.45    "S"  1
-     1  "male"    26.0  0  0  30.0     "C"  0
-     3  "male"    32.0  0  0   7.75    "Q"  0
+     3  "male"    22.0     1  0   7.25    "S"  0
+     1  "female"  38.0     1  0  71.2833  "C"  0
+     3  "female"  26.0     0  0   7.925   "S"  0
+     1  "female"  35.0     1  0  53.1     "S"  0
+     3  "male"    35.0     0  0   8.05    "S"  0
+     3  "male"    29.6991  0  0   8.4583  "Q"  1
+     1  "male"    54.0     0  0  51.8625  "S"  0
+     3  "male"     2.0     3  1  21.075   "S"  1
+     3  "female"  27.0     0  2  11.1333  "S"  0
+     2  "female"  14.0     1  0  30.0708  "C"  1
+     3  "female"   4.0     1  1  16.7     "S"  1
+     1  "female"  58.0     0  0  26.55    "S"  0
+     3  "male"    20.0     0  0   8.05    "S"  0
+     ⋮                            ⋮             
+     1  "female"  56.0     0  1  83.1583  "C"  0
+     2  "female"  25.0     0  1  26.0     "S"  0
+     3  "male"    33.0     0  0   7.8958  "S"  0
+     3  "female"  22.0     0  0  10.5167  "S"  0
+     2  "male"    28.0     0  0  10.5     "S"  0
+     3  "male"    25.0     0  0   7.05    "S"  0
+     3  "female"  39.0     0  5  29.125   "Q"  0
+     2  "male"    27.0     0  0  13.0     "S"  0
+     1  "female"  19.0     0  0  30.0     "S"  0
+     3  "female"  29.6991  1  2  23.45    "S"  1
+     1  "male"    26.0     0  0  30.0     "C"  0
+     3  "male"    32.0     0  0   7.75    "Q"  0
 
 
+
+## Stumps
+A stump is the simplest decision tree, with only one split and two classification nodes (leaves). It tries to generate a single split with most predictive power. This is performed by splitting the dataset into 2 subset and returning the split with highest information gain. We will use the ```build_stumps``` api from DecisionTree and feed it with the above generated labels and features.
 
 
     stump = build_stump(labels, features)
@@ -5002,61 +4953,59 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     accuracy = nfoldCV_tree(labels, features, 0.9, 3)
 
     Feature 2, Threshold male
+
+
+
+    2x2 Array{Int64,2}:
+     145  32
+      44  76
+
+
     L-> 1 : 233/314
     R-> 0 : 468/577
     
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     155  33
-      29  80
-
-
-    1
+    Fold 1
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 
-
-
-    2x2 Array{Int64,2}:
-     141  31
-      38  87
-
-
-    0.7912457912457912
-    Kappa:    0.554140435835351
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7676767676767676
-    Kappa:    0.5197440884910125
+    Accuracy: 0.7441077441077442
+    Kappa:    0.4599483204134368
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     159  30
-      37  71
+     152  35
+      32  78
 
 
-    3
+
+    2x2 Array{Int64,2}:
+     141  44
+      31  81
+
+
+    2
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.7744107744107744
-    Kappa:    0.5057008718980551
+    Kappa:    0.5190109013560225
     
-    Mean Accuracy: 0.7777777777777777
+    Fold 3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7474747474747475
+    Kappa:    0.47450989643539604
+    
+    Mean Accuracy: 0.755331088664422
 
 
 
 
 
     3-element Array{Float64,1}:
-     0.791246
-     0.767677
+     0.744108
      0.774411
+     0.747475
 
 
 
@@ -5074,8 +5023,8 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     134  38
-      40  85
+     143  34
+      35  85
 
 
     
@@ -5083,20 +5032,20 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
         L-> Feature 6, Threshold 29.0
             L-> Feature 6, Threshold 28.7125
                 L-> Feature 3, Threshold 24.0
-                    L-> 1 : 16/16
+                    L-> 1 : 15/15
                     R-> 
                 R-> 0 : 1/1
-            R-> Feature 5, Threshold 2
-                L-> 1 : 84/84
-                R-> Feature 3, Threshold 3.0
-                    L-> 0 : 1/1
+            R-> Feature 3, Threshold 3.0
+                L-> 0 : 1/1
+                R-> Feature 5, Threshold 2
+                    L-> 1 : 84/84
                     R-> 
         R-> Feature 6, Threshold 23.45
-            L-> Feature 3, Threshold 17.0
-                L-> Feature 4, Threshold 3
+            L-> Feature 8, Threshold 1
+                L-> Feature 3, Threshold 37.0
                     L-> 
-                    R-> 0 : 2/2
-                R-> Feature 3, Threshold 37.0
+                    R-> 
+                R-> Feature 6, Threshold 15.5
                     L-> 
                     R-> 
             R-> Feature 5, Threshold 1
@@ -5105,77 +5054,73 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
                     L-> 0 : 15/15
                     R-> 
     R-> Feature 6, Threshold 26.2875
-        L-> Feature 5, Threshold 1
-            L-> Feature 3, Threshold 45.5
-                L-> Feature 3, Threshold 25.0
-                    L-> 
-                    R-> 
-                R-> Feature 3, Threshold 62.0
-                    L-> 0 : 25/25
-                    R-> 
-            R-> Feature 3, Threshold 15.0
-                L-> Feature 6, Threshold 21.075
+        L-> Feature 3, Threshold 15.0
+            L-> Feature 4, Threshold 3
+                L-> Feature 3, Threshold 11.0
                     L-> 1 : 12/12
                     R-> 
-                R-> Feature 7, Threshold Q
-                    L-> 
-                    R-> 0 : 15/15
-        R-> Feature 4, Threshold 3
-            L-> Feature 3, Threshold 54.0
-                L-> Feature 6, Threshold 27.0
+                R-> 0 : 1/1
+            R-> Feature 7, Threshold Q
+                L-> Feature 6, Threshold 15.2458
                     L-> 
                     R-> 
-                R-> Feature 3, Threshold 80.0
+                R-> Feature 6, Threshold 13.5
                     L-> 
-                    R-> 1 : 1/1
+                    R-> 0 : 62/64
+        R-> Feature 4, Threshold 3
+            L-> Feature 3, Threshold 16.0
+                L-> 1 : 7/7
+                R-> Feature 6, Threshold 26.55
+                    L-> 1 : 4/4
+                    R-> 
             R-> Feature 3, Threshold 4.0
                 L-> Feature 3, Threshold 3.0
-                    L-> 0 : 8/8
+                    L-> 0 : 4/4
                     R-> 1 : 1/1
-                R-> 0 : 14/14
+                R-> 0 : 18/18
     
     Fold 1
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7373737373737373
-    Kappa:    0.46007551391413787
+    Accuracy: 0.7676767676767676
+    Kappa:    0.516936567428046
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     141  46
-      36  74
+     142  53
+      22  80
 
 
 
     2x2 Array{Int64,2}:
-     151  39
-      27  80
+     150  27
+      31  89
 
 
     2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7239057239057239
-    Kappa:    0.4188976377952756
+    Accuracy: 0.7474747474747475
+    Kappa:    0.4778848182265664
     
     Fold 3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7777777777777778
-    Kappa:    0.5294315344728251
+    Accuracy: 0.8047138047138047
+    Kappa:    0.5923033229196251
     
-    Mean Accuracy: 0.7463524130190797
+    Mean Accuracy: 0.7732884399551067
 
 
 
 
 
     3-element Array{Float64,1}:
-     0.737374
-     0.723906
-     0.777778
+     0.767677
+     0.747475
+     0.804714
 
 
 
@@ -5190,52 +5135,52 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     166  14
-      46  71
+     162  12
+      45  78
 
 
 
     2x2 Array{Int64,2}:
-     169  17
-      37  74
+     184  21
+      26  66
 
 
     
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.797979797979798
-    Kappa:    0.5556552962298026
+    Accuracy: 0.8080808080808081
+    Kappa:    0.5883125410374261
     
     Fold 2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.8181818181818182
-    Kappa:    0.596954161640531
+    Accuracy: 0.8417508417508418
+    Kappa:    0.6243035930561164
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     176   7
-      41  73
+     153  17
+      52  75
 
 
     3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.8383838383838383
-    Kappa:    0.637970440347402
+    Accuracy: 0.7676767676767676
+    Kappa:    0.5082663467306537
     
-    Mean Accuracy: 0.8181818181818182
+    Mean Accuracy: 0.8058361391694725
 
 
 
 
 
     3-element Array{Float64,1}:
-     0.79798 
-     0.818182
-     0.838384
+     0.808081
+     0.841751
+     0.767677
 
 
 
@@ -5250,54 +5195,54 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     151  37
-      36  73
+     173  14
+      49  61
 
 
     1
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7542087542087542
-    Kappa:    0.4720064291454595
+    Accuracy: 0.7878787878787878
+    Kappa:    0.5133047210300429
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     152  33
-      38  74
+     169  11
+      58  59
 
 
     2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7609427609427609
-    Kappa:    0.48662203286670713
+    Accuracy: 0.7676767676767676
+    Kappa:    0.47667202941852443
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     156  20
-      56  65
+     150  32
+      48  67
 
 
     3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7441077441077442
-    Kappa:    0.44420368364030344
+    Accuracy: 0.7306397306397306
+    Kappa:    0.41747572815533984
     
-    Mean Accuracy: 0.7530864197530865
+    Mean Accuracy: 0.7620650953984286
 
 
 
 
 
     3-element Array{Float64,1}:
-     0.754209
-     0.760943
-     0.744108
+     0.787879
+     0.767677
+     0.73064 
 
 
 
@@ -5320,24 +5265,32 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     Feature 2, Threshold male
+
+
+    2x2 Array{Int64,2}:
+     138  32
+      35  92
+
+
+    
     L-> Feature 1, Threshold 3
         L-> Feature 6, Threshold 29.0
             L-> Feature 6, Threshold 28.7125
                 L-> Feature 3, Threshold 24.0
-                    L-> 1 : 16/16
+                    L-> 1 : 15/15
                     R-> 
                 R-> 0 : 1/1
-            R-> Feature 5, Threshold 2
-                L-> 1 : 84/84
-                R-> Feature 3, Threshold 3.0
-                    L-> 0 : 1/1
+            R-> Feature 3, Threshold 3.0
+                L-> 0 : 1/1
+                R-> Feature 5, Threshold 2
+                    L-> 1 : 84/84
                     R-> 
         R-> Feature 6, Threshold 23.45
-            L-> Feature 3, Threshold 17.0
-                L-> Feature 4, Threshold 3
+            L-> Feature 8, Threshold 1
+                L-> Feature 3, Threshold 37.0
                     L-> 
-                    R-> 0 : 2/2
-                R-> Feature 3, Threshold 37.0
+                    R-> 
+                R-> Feature 6, Threshold 15.5
                     L-> 
                     R-> 
             R-> Feature 5, Threshold 1
@@ -5346,210 +5299,86 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
                     L-> 0 : 15/15
                     R-> 
     R-> Feature 6, Threshold 26.2875
-        L-> Feature 5, Threshold 1
-            L-> Feature 3, Threshold 45.5
-                L-> Feature 3, Threshold 25.0
-                    L-> 
-                    R-> 
-                R-> Feature 3, Threshold 62.0
-                    L-> 0 : 25/25
-                    R-> 
-            R-> Feature 3, Threshold 15.0
-                L-> Feature 6, Threshold 21.075
+        L-> Feature 3, Threshold 15.0
+            L-> Feature 4, Threshold 3
+                L-> Feature 3, Threshold 11.0
                     L-> 1 : 12/12
                     R-> 
-                R-> Feature 7, Threshold Q
-                    L-> 
-                    R-> 0 : 15/15
-        R-> Feature 4, Threshold 3
-            L-> Feature 3, Threshold 54.0
-                L-> Feature 6, Threshold 27.0
+                R-> 0 : 1/1
+            R-> Feature 7, Threshold Q
+                L-> Feature 6, Threshold 15.2458
                     L-> 
                     R-> 
-                R-> Feature 3, Threshold 80.0
+                R-> Feature 6, Threshold 13.5
                     L-> 
-                    R-> 1 : 1/1
+                    R-> 0 : 62/64
+        R-> Feature 4, Threshold 3
+            L-> Feature 3, Threshold 16.0
+                L-> 1 : 7/7
+                R-> Feature 6, Threshold 26.55
+                    L-> 1 : 4/4
+                    R-> 
             R-> Feature 3, Threshold 4.0
                 L-> Feature 3, Threshold 3.0
-                    L-> 0 : 8/8
+                    L-> 0 : 4/4
                     R-> 1 : 1/1
-                R-> 0 : 14/14
+                R-> 0 : 18/18
+    
+    Fold 1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7744107744107744
+    Kappa:    0.5377807716429351
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     145  38
-      36  78
+     176  26
+      31  64
 
 
 
     2x2 Array{Int64,2}:
-     148  30
-      30  89
+     149  28
+      37  83
+
+
+    2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8080808080808081
+    Kappa:    0.5526753864447087
+    
+    Fold 3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7811447811447811
+    Kappa:    0.5399957109157195
+    
+    Mean Accuracy: 0.787878787878788
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     55  0
+     34  0
 
 
     1
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7508417508417509
-    Kappa:    0.4749892503941523
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.797979797979798
-    Kappa:    0.579359833821169
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     159  29
-      24  85
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8215488215488216
-    Kappa:    0.619589646922352
-    
-    Mean Accuracy: 0.7901234567901234
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     49  0
-     40  0
-
-
-
-    2x2 Array{Int64,2}:
-     53  0
-     36  0
-
-
-    1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.550561797752809
-    Kappa:    0.0
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5955056179775281
+    Accuracy: 0.6179775280898876
     Kappa:    0.0
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     48  0
-     41  0
+     57  0
+     32  0
 
-
-
-    2x2 Array{Int64,2}:
-     65  0
-     24  0
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5393258426966292
-    Kappa:    0.0
-    
-    Fold 4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7303370786516854
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     58  0
-     31  0
-
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-    5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.651685393258427
-    Kappa:    0.0
-    
-    Fold 6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6292134831460674
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     53  0
-     36  0
-
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
-
-
-    7
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5955056179775281
-    Kappa:    0.0
-    
-    Fold 8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6067415730337079
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     59  0
-     30  0
-
-
-
-    2x2 Array{Int64,2}:
-     53  0
-     36  0
-
-
-    9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6629213483146067
-    Kappa:    0.0
-    
-    Fold 10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5955056179775281
-    Kappa:    0.0
-    
-    Mean Accuracy: 0.6157303370786517
-    
-    Fold 
 
 
     2x2 Array{Int64,2}:
@@ -5557,324 +5386,24 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      38  0
 
 
-
-    2x2 Array{Int64,2}:
-     53  0
-     36  0
-
-
-    1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5730337078651685
-    Kappa:    0.0
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5955056179775281
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     55  0
-     34  0
-
-
-
-    2x2 Array{Int64,2}:
-     57  0
-     32  0
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6179775280898876
-    Kappa:    0.0
-    
-    Fold 4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6404494382022472
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     55  0
-     34  0
-
-
-    5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6179775280898876
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     57  0
-     32  0
-
-
-    6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6404494382022472
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-
-    2x2 Array{Int64,2}:
-     55  0
-     34  0
-
-
-    7
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6292134831460674
-    Kappa:    0.0
-    
-    Fold 8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6179775280898876
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
-
-
-    9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6067415730337079
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     55  0
-     34  0
-
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
-
-
-    10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6179775280898876
-    Kappa:    0.0
-    
-    Mean Accuracy: 0.6157303370786517
-    
-    Fold 1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6067415730337079
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
-
-
     2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.6292134831460674
+    Accuracy: 0.6404494382022472
     Kappa:    0.0
     
     Fold 3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.6067415730337079
+    Accuracy: 0.5730337078651685
     Kappa:    0.0
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     59  0
-     30  0
-
-
-
-    2x2 Array{Int64,2}:
-     57  0
-     32  0
-
-
-    4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6629213483146067
-    Kappa:    0.0
-    
-    Fold 5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6404494382022472
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     57  0
-     32  0
-
-
-
-    2x2 Array{Int64,2}:
-     47  0
-     42  0
-
-
-    6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6404494382022472
-    Kappa:    0.0
-    
-    Fold 7
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5280898876404494
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-    8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6292134831460674
-    Kappa:    0.0
-    
-    Fold 9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6292134831460674
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     53  0
-     36  0
-
-
-
-    2x2 Array{Int64,2}:
-     56  0
-     33  0
-
-
-    10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5955056179775281
-    Kappa:    0.0
-    
-    Mean Accuracy: 0.6168539325842696
-    
-    Fold 1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6292134831460674
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     58  0
-     31  0
-
-
-    2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.651685393258427
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
-
-
-
-    2x2 Array{Int64,2}:
-     61  0
-     28  0
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6067415730337079
-    Kappa:    0.0
-    
-    Fold 4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6853932584269663
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     54  0
-     35  0
+     55  0
+     34  0
 
 
 
@@ -5883,71 +5412,17 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      40  0
 
 
-    5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6067415730337079
-    Kappa:    0.0
-    
-    Fold 6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.550561797752809
-    Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     55  0
-     34  0
-
-
-
-    2x2 Array{Int64,2}:
-     52  0
-     37  0
-
-
-    7
+    4
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.6179775280898876
     Kappa:    0.0
     
-    Fold 8
+    Fold 5
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.5842696629213483
+    Accuracy: 0.550561797752809
     Kappa:    0.0
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     52  0
-     37  0
-
-
-
-    2x2 Array{Int64,2}:
-     58  0
-     31  0
-
-
-    9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.5842696629213483
-    Kappa:    0.0
-    
-    Fold 10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.651685393258427
-    Kappa:    0.0
-    
-    Mean Accuracy: 0.6168539325842696
     
     Fold 
 
@@ -5963,13 +5438,13 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      27  0
 
 
-    1
+    6
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.5842696629213483
     Kappa:    0.0
     
-    Fold 2
+    Fold 7
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.6966292134831461
@@ -5979,8 +5454,8 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     55  0
-     34  0
+     58  0
+     31  0
 
 
 
@@ -5989,17 +5464,165 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      38  0
 
 
+    8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.651685393258427
+    Kappa:    0.0
+    
+    Fold 9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5730337078651685
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     59  0
+     30  0
+
+
+    10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6629213483146067
+    Kappa:    0.0
+    
+    Mean Accuracy: 0.6168539325842697
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     58  0
+     31  0
+
+
+
+    2x2 Array{Int64,2}:
+     48  0
+     41  0
+
+
+    1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.651685393258427
+    Kappa:    0.0
+    
+    Fold 2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5393258426966292
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     51  0
+     38  0
+
+
+
+    2x2 Array{Int64,2}:
+     65  0
+     24  0
+
+
     3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.6179775280898876
+    Accuracy: 0.5730337078651685
     Kappa:    0.0
     
     Fold 4
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.5730337078651685
+    Accuracy: 0.7303370786516854
     Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     54  0
+     35  0
+
+
+
+    2x2 Array{Int64,2}:
+     52  0
+     37  0
+
+
+    5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6067415730337079
+    Kappa:    0.0
+    
+    Fold 6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5842696629213483
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     53  0
+     36  0
+
+
+
+    2x2 Array{Int64,2}:
+     54  0
+     35  0
+
+
+    7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5955056179775281
+    Kappa:    0.0
+    
+    Fold 8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6067415730337079
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     52  0
+     37  0
+
+
+
+    2x2 Array{Int64,2}:
+     61  0
+     28  0
+
+
+    9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5842696629213483
+    Kappa:    0.0
+    
+    Fold 10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6853932584269663
+    Kappa:    0.0
+    
+    Mean Accuracy: 0.6157303370786518
     
     Fold 
 
@@ -6011,20 +5634,204 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     56  0
-     33  0
+     58  0
+     31  0
 
 
-    5
+    1
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.6179775280898876
     Kappa:    0.0
     
-    Fold 6
+    Fold 2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.651685393258427
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     62  0
+     27  0
+
+
+
+    2x2 Array{Int64,2}:
+     56  0
+     33  0
+
+
+    3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6966292134831461
+    Kappa:    0.0
+    
+    Fold 4
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.6292134831460674
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     48  0
+     41  0
+
+
+
+    2x2 Array{Int64,2}:
+     50  0
+     39  0
+
+
+    5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5393258426966292
+    Kappa:    0.0
+    
+    Fold 6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5617977528089888
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     61  0
+     28  0
+
+
+
+    2x2 Array{Int64,2}:
+     54  0
+     35  0
+
+
+    7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6853932584269663
+    Kappa:    0.0
+    
+    Fold 8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6067415730337079
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     56  0
+     33  0
+
+
+
+    2x2 Array{Int64,2}:
+     48  0
+     41  0
+
+
+    9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6292134831460674
+    Kappa:    0.0
+    
+    Fold 10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5393258426966292
+    Kappa:    0.0
+    
+    Mean Accuracy: 0.6157303370786517
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     48  0
+     41  0
+
+
+
+    2x2 Array{Int64,2}:
+     48  0
+     41  0
+
+
+    1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5393258426966292
+    Kappa:    0.0
+    
+    Fold 2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5393258426966292
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     56  0
+     33  0
+
+
+
+    2x2 Array{Int64,2}:
+     60  0
+     29  0
+
+
+    3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6292134831460674
+    Kappa:    0.0
+    
+    Fold 4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6741573033707865
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     59  0
+     30  0
+
+
+
+    2x2 Array{Int64,2}:
+     53  0
+     36  0
+
+
+    5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6629213483146067
+    Kappa:    0.0
+    
+    Fold 6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5955056179775281
     Kappa:    0.0
     
     Fold 
@@ -6037,8 +5844,8 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     58  0
-     31  0
+     51  0
+     38  0
 
 
     7
@@ -6050,10 +5857,16 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     Fold 8
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.651685393258427
+    Accuracy: 0.5730337078651685
     Kappa:    0.0
     
     Fold 
+
+
+    2x2 Array{Int64,2}:
+     61  0
+     28  0
+
 
 
     2x2 Array{Int64,2}:
@@ -6064,6 +5877,132 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     9
     Classes:  {0,1}
     Matrix:   
+    Accuracy: 0.6853932584269663
+    Kappa:    0.0
+    
+    Fold 10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5842696629213483
+    Kappa:    0.0
+    
+    Mean Accuracy: 0.6157303370786517
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     55  0
+     34  0
+
+
+
+    2x2 Array{Int64,2}:
+     54  0
+     35  0
+
+
+    1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6179775280898876
+    Kappa:    0.0
+    
+    Fold 2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6067415730337079
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     55  0
+     34  0
+
+
+    3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6179775280898876
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     57  0
+     32  0
+
+
+
+    2x2 Array{Int64,2}:
+     56  0
+     33  0
+
+
+    4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6404494382022472
+    Kappa:    0.0
+    
+    Fold 5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6292134831460674
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     53  0
+     36  0
+
+
+
+    2x2 Array{Int64,2}:
+     54  0
+     35  0
+
+
+    6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5955056179775281
+    Kappa:    0.0
+    
+    Fold 7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6067415730337079
+    Kappa:    0.0
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     51  0
+     38  0
+
+
+
+    2x2 Array{Int64,2}:
+     52  0
+     37  0
+
+
+    8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.5730337078651685
+    Kappa:    0.0
+    
+    Fold 9
+    Classes:  {0,1}
+    Matrix:   
     Accuracy: 0.5842696629213483
     Kappa:    0.0
     
@@ -6071,20 +6010,20 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
 
 
     2x2 Array{Int64,2}:
-     47  0
-     42  0
+     61  0
+     28  0
 
 
 
     2x2 Array{Int64,2}:
-     47   8
-     11  23
+     47  10
+      8  24
 
 
     10
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.5280898876404494
+    Accuracy: 0.6853932584269663
     Kappa:    0.0
     
     Mean Accuracy: 0.6157303370786517
@@ -6092,208 +6031,384 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     Fold 1
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5401142235518086
+    Accuracy: 0.797752808988764
+    Kappa:    0.5667928610059491
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     48  10
-      6  25
+     47  11
+      8  23
 
 
 
     2x2 Array{Int64,2}:
-     49   7
-     18  15
+     53   8
+      7  21
 
 
     2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.8202247191011236
-    Kappa:    0.6155507559395249
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5401142235518086
     
     Fold 3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7191011235955056
-    Kappa:    0.3537612547197211
+    Accuracy: 0.8314606741573034
+    Kappa:    0.6129312844302697
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     45   3
-     14  27
+     39   6
+     13  31
 
 
 
     2x2 Array{Int64,2}:
-     52   9
-     10  18
+     46  15
+     11  17
 
 
     4
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.8089887640449438
-    Kappa:    0.6079295154185022
+    Accuracy: 0.7865168539325843
+    Kappa:    0.572223627624589
     
     Fold 5
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5001477978125924
+    Accuracy: 0.7078651685393258
+    Kappa:    0.3478015783540021
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     47   2
-     13  27
+     37  16
+      8  28
 
 
 
     2x2 Array{Int64,2}:
-     46  14
-      6  23
+     47  10
+      9  23
+
+
+    6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7303370786516854
+    Kappa:    0.4595141700404859
+    
+    Fold 7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5396133950449226
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     49   6
+      4  30
+
+
+
+    2x2 Array{Int64,2}:
+     38   8
+      8  35
+
+
+    8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8876404494382022
+    Kappa:    0.7646747752511898
+    
+    Fold 9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8202247191011236
+    Kappa:    0.6400404448938322
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     50   5
+     12  22
+
+
+
+    2x2 Array{Int64,2}:
+     47  10
+      7  25
+
+
+    10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.5789034233231283
+    
+    Mean Accuracy: 0.7943820224719103
+    
+    Fold 1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.593607305936073
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     44   7
+      4  34
+
+
+
+    2x2 Array{Int64,2}:
+     47   9
+      7  26
+
+
+    2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8764044943820225
+    Kappa:    0.7499361430395914
+    
+    Fold 3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8202247191011236
+    Kappa:    0.6194548369855692
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     45  13
+      8  23
+
+
+
+    2x2 Array{Int64,2}:
+     49  12
+      6  22
+
+
+    4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7640449438202247
+    Kappa:    0.49906191369605996
+    
+    Fold 5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.797752808988764
+    Kappa:    0.5567238516878804
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     48   5
+     10  26
+
+
+
+    2x2 Array{Int64,2}:
+     49   6
+     11  23
 
 
     6
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.8314606741573034
-    Kappa:    0.6506150222454855
+    Kappa:    0.6421870812114715
     
     Fold 7
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.5225321888412017
+    Accuracy: 0.8089887640449438
+    Kappa:    0.5837689133425034
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     51   8
-      9  21
+     45  10
+     15  19
 
 
 
     2x2 Array{Int64,2}:
-     45   7
-     10  27
+     44  10
+     10  25
+
+
+    8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7191011235955056
+    Kappa:    0.3878954607977991
+    
+    Fold 9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7752808988764045
+    Kappa:    0.5291005291005291
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     39   9
+     16  25
+
+
+
+    2x2 Array{Int64,2}:
+     43   7
+     10  29
+
+
+    10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7191011235955056
+    Kappa:    0.42757910985335734
+    
+    Mean Accuracy: 0.7921348314606742
+    
+    Fold 1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.6087406258081199
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     48  15
+      4  22
+
+
+
+    2x2 Array{Int64,2}:
+     44   9
+     12  24
+
+
+    2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5408634265544394
+    
+    Fold 3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7640449438202247
+    Kappa:    0.5035856573705179
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     46   7
+     15  21
+
+
+
+    2x2 Array{Int64,2}:
+     48   6
+     11  24
+
+
+    4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7528089887640449
+    Kappa:    0.4679347826086956
+    
+    Fold 5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.5894165535956579
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     42  10
+      5  32
+
+
+
+    2x2 Array{Int64,2}:
+     48  11
+     11  19
+
+
+    6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8314606741573034
+    Kappa:    0.6596992097884272
+    
+    Fold 7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7528089887640449
+    Kappa:    0.44689265536723155
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     52   9
+      8  20
+
+
+
+    2x2 Array{Int64,2}:
+     41  10
+      7  31
 
 
     8
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.8089887640449438
-    Kappa:    0.5690686414127029
+    Kappa:    0.5613221223543056
     
     Fold 9
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.8089887640449438
-    Kappa:    0.6021561924796214
+    Kappa:    0.6135376756066411
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     43   8
-      7  31
+     39  13
+     10  27
 
-
-
-    2x2 Array{Int64,2}:
-     50   8
-     10  21
-
-
-    10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8314606741573034
-    Kappa:    0.6567240935973259
-    
-    Mean Accuracy: 0.7977528089887642
-    
-    Fold 1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.797752808988764
-    Kappa:    0.5477131564088085
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     50   9
-      9  21
-
-
-
-    2x2 Array{Int64,2}:
-     40  11
-     10  28
-
-
-    2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.797752808988764
-    Kappa:    0.547457627118644
-    
-    Fold 3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7640449438202247
-    Kappa:    0.519413731036256
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     44   6
-      6  33
-
-
-
-    2x2 Array{Int64,2}:
-     43   7
-      6  33
-
-
-    4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8651685393258427
-    Kappa:    0.7261538461538461
-    
-    Fold 5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8539325842696629
-    Kappa:    0.704167732037842
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     46  10
-      9  24
-
-
-    6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5453078784619522
-    
-    Fold 
 
 
     2x2 Array{Int64,2}:
@@ -6301,449 +6416,273 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      11  25
 
 
-
-    2x2 Array{Int64,2}:
-     48  11
-      9  21
-
-
-    7
+    10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7415730337078652
+    Kappa:    0.4741844335987671
+    
+    Mean Accuracy: 0.7865168539325843
+    
+    Fold 1
     Classes:  {0,1}
     Matrix:   
     Accuracy: 0.7640449438202247
     Kappa:    0.5080284285338246
     
-    Fold 8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.5052807115063924
-    
     Fold 
 
 
     2x2 Array{Int64,2}:
-     52  10
-      6  21
+     47  13
+     10  19
 
 
 
     2x2 Array{Int64,2}:
-     42   8
-     15  24
-
-
-    9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8202247191011236
-    Kappa:    0.591743119266055
-    
-    Fold 10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7415730337078652
-    Kappa:    0.4645566309181272
-    
-    Mean Accuracy: 0.7966292134831461
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     42  13
+     45  10
      11  23
-
-
-
-    2x2 Array{Int64,2}:
-     48   5
-      8  28
-
-
-    1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7303370786516854
-    Kappa:    0.43521946060285566
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8539325842696629
-    Kappa:    0.6926958831341301
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     42  13
-     15  19
-
-
-
-    2x2 Array{Int64,2}:
-     47   7
-     13  22
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6853932584269663
-    Kappa:    0.3261222282314765
-    
-    Fold 4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.514457174031642
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     48   9
-      6  26
-
-
-
-    2x2 Array{Int64,2}:
-     44  14
-      7  24
-
-
-    5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8314606741573034
-    Kappa:    0.6414182111200646
-    
-    Fold 6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7640449438202247
-    Kappa:    0.5062087186261559
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     42   7
-     11  29
-
-
-
-    2x2 Array{Int64,2}:
-     45  12
-      9  23
-
-
-    7
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.797752808988764
-    Kappa:    0.5875386199794026
-    
-    Fold 8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7640449438202247
-    Kappa:    0.49798549556809024
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     44  10
-     11  24
-
-
-
-    2x2 Array{Int64,2}:
-     47   9
-      9  24
-
-
-    9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7640449438202247
-    Kappa:    0.5030576974208987
-    
-    Fold 10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.797752808988764
-    Kappa:    0.5665584415584415
-    
-    Mean Accuracy: 0.7764044943820225
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     50   6
-      8  25
-
-
-
-    2x2 Array{Int64,2}:
-     41   9
-     14  25
-
-
-    1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8426966292134831
-    Kappa:    0.6586301369863012
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7415730337078652
-    Kappa:    0.4676202860858258
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     52   7
-     12  18
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5019145802650958
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     42  11
-      8  28
-
-
-
-    2x2 Array{Int64,2}:
-     38  12
-     10  29
-
-
-    4
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5627101111973106
-    
-    Fold 5
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7528089887640449
-    Kappa:    0.5007649158592554
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     44  16
-     12  17
-
-
-
-    2x2 Array{Int64,2}:
-     50   8
-     14  17
-
-
-    6
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.6853932584269663
-    Kappa:    0.3085460599334073
-    
-    Fold 7
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7528089887640449
-    Kappa:    0.42981945253348847
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     42  11
-      9  27
-
-
-
-    2x2 Array{Int64,2}:
-     46   7
-      9  27
-
-
-    8
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.5376623376623377
-    
-    Fold 9
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.8202247191011236
-    Kappa:    0.6234796404019037
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     48   8
-     11  22
-
-
-
-    2x2 Array{Int64,2}:
-     42  10
-      9  28
-
-
-    10
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.5337744692583404
-    
-    Mean Accuracy: 0.7730337078651685
-    
-    Fold 1
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.562257312969195
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     48   4
-      5  32
 
 
     2
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.898876404494382
-    Kappa:    0.7910253065483954
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     43  14
-      9  23
-
-
-
-    2x2 Array{Int64,2}:
-     37  22
-      7  23
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
     Accuracy: 0.7415730337078652
-    Kappa:    0.45746090644049836
+    Kappa:    0.42709207948502664
     
-    Fold 4
+    Fold 3
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.6741573033707865
-    Kappa:    0.350691823899371
+    Accuracy: 0.7640449438202247
+    Kappa:    0.49744554987899964
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     43   6
-     13  27
+     45  14
+     10  20
+
+
+    4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7303370786516854
+    Kappa:    0.41575492341356673
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     51   8
+      5  25
 
 
 
     2x2 Array{Int64,2}:
-     45   8
-     12  24
+     41  10
+     14  24
 
 
     5
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7865168539325843
-    Kappa:    0.561576354679803
+    Accuracy: 0.8539325842696629
+    Kappa:    0.6810035842293907
     
     Fold 6
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.5250800426894344
+    Accuracy: 0.7303370786516854
+    Kappa:    0.4414225941422594
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     52   6
-      8  23
+     47  10
+      7  25
 
 
 
     2x2 Array{Int64,2}:
-     44  10
-     12  23
+     41   8
+     12  28
 
 
     7
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.8426966292134831
-    Kappa:    0.6482213438735176
+    Accuracy: 0.8089887640449438
+    Kappa:    0.593607305936073
     
     Fold 8
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7528089887640449
-    Kappa:    0.4767504008551576
+    Accuracy: 0.7752808988764045
+    Kappa:    0.5417095777548919
     
     Fold 
 
 
     2x2 Array{Int64,2}:
-     51   5
-     15  18
+     43   9
+     13  24
 
 
 
     2x2 Array{Int64,2}:
-     41  17
-      9  22
+     45   9
+     10  25
 
 
     9
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7752808988764045
-    Kappa:    0.48643969994229663
+    Accuracy: 0.7528089887640449
+    Kappa:    0.483104540654699
     
     Fold 10
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 0.7078651685393258
-    Kappa:    0.3929695697796432
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5503855357617655
     
-    Mean Accuracy: 0.7741573033707866
+    Mean Accuracy: 0.7707865168539325
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     45   9
+     10  25
+
+
+
+    2x2 Array{Int64,2}:
+     47  10
+      8  24
+
+
+    1
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5503855357617655
+    
+    Fold 2
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.797752808988764
+    Kappa:    0.5667928610059491
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     38  14
+     11  26
+
+
+    3
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7191011235955056
+    Kappa:    0.428461340868225
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     52  12
+      5  20
+
+
+
+    2x2 Array{Int64,2}:
+     49   6
+     15  19
+
+
+    4
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.5643535847970054
+    
+    Fold 5
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7640449438202247
+    Kappa:    0.47366938890453386
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     47   7
+     10  25
+
+
+
+    2x2 Array{Int64,2}:
+     50   7
+     11  21
+
+
+    6
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.8089887640449438
+    Kappa:    0.593607305936073
+    
+    Fold 7
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.797752808988764
+    Kappa:    0.5484780157835398
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     40  10
+      9  30
+
+
+
+    2x2 Array{Int64,2}:
+     39  15
+     12  23
+
+
+    8
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7865168539325843
+    Kappa:    0.5676297622091537
+    
+    Fold 9
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.6966292134831461
+    Kappa:    0.37372947615324487
+    
+    Fold 
+
+
+    2x2 Array{Int64,2}:
+     39  13
+     10  27
+
+
+    10
+    Classes:  {0,1}
+    Matrix:   
+    Accuracy: 0.7415730337078652
+    Kappa:    0.4741844335987671
+    
+    Mean Accuracy: 0.7707865168539326
 
 
 
@@ -6763,12 +6702,12 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82">
-<g class="plotroot xscalable yscalable" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-2">
+     id="fig-74656c1f2802434d8d525d460c8e7000">
+<g class="plotroot xscalable yscalable" id="fig-74656c1f2802434d8d525d460c8e7000-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-74656c1f2802434d8d525d460c8e7000-element-2">
     <text x="77.46" y="88.39" text-anchor="middle" dy="0.6em">x</text>
   </g>
-  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-3">
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-74656c1f2802434d8d525d460c8e7000-element-3">
     <text x="-121.9" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-1.25</text>
     <text x="-93.42" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-1.00</text>
     <text x="-64.94" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-0.75</text>
@@ -6881,11 +6820,11 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     <text x="236.95" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">1.9</text>
     <text x="248.34" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">2.0</text>
   </g>
-  <g clip-path="url(#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-5)" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-4">
-    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-6">
+  <g clip-path="url(#fig-74656c1f2802434d8d525d460c8e7000-element-5)" id="fig-74656c1f2802434d8d525d460c8e7000-element-4">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-74656c1f2802434d8d525d460c8e7000-element-6">
       <rect x="18.5" y="5" width="117.92" height="75.72"/>
     </g>
-    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-7">
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-74656c1f2802434d8d525d460c8e7000-element-7">
       <path fill="none" d="M18.5,168.36 L 136.42 168.36" gadfly:scale="1.0" visibility="hidden"/>
       <path fill="none" d="M18.5,150.43 L 136.42 150.43" gadfly:scale="1.0" visibility="hidden"/>
       <path fill="none" d="M18.5,132.5 L 136.42 132.5" gadfly:scale="1.0" visibility="hidden"/>
@@ -6998,7 +6937,7 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
       <path fill="none" d="M18.5,-57.54 L 136.42 -57.54" gadfly:scale="5.0" visibility="hidden"/>
       <path fill="none" d="M18.5,-64.71 L 136.42 -64.71" gadfly:scale="5.0" visibility="hidden"/>
     </g>
-    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-8">
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-74656c1f2802434d8d525d460c8e7000-element-8">
       <path fill="none" d="M-121.9,5 L -121.9 80.72" gadfly:scale="1.0" visibility="hidden"/>
       <path fill="none" d="M-93.42,5 L -93.42 80.72" gadfly:scale="1.0" visibility="hidden"/>
       <path fill="none" d="M-64.94,5 L -64.94 80.72" gadfly:scale="1.0" visibility="hidden"/>
@@ -7111,47 +7050,47 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
       <path fill="none" d="M236.95,5 L 236.95 80.72" gadfly:scale="5.0" visibility="hidden"/>
       <path fill="none" d="M248.34,5 L 248.34 80.72" gadfly:scale="5.0" visibility="hidden"/>
     </g>
-    <g class="plotpanel" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-9">
-      <g stroke-width="0.3" fill="#000000" fill-opacity="0.000" class="geometry" stroke="#00BFFF" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-10">
-        <path fill="none" d="M31.89,73.07 L 43.28 73.07 54.68 72.67 66.07 72.67 77.46 73.07 88.85 7.81 100.24 8.21 111.64 15.46 123.03 16.67 134.42 16.27"/>
+    <g class="plotpanel" id="fig-74656c1f2802434d8d525d460c8e7000-element-9">
+      <g stroke-width="0.3" fill="#000000" fill-opacity="0.000" class="geometry" stroke="#00BFFF" id="fig-74656c1f2802434d8d525d460c8e7000-element-10">
+        <path fill="none" d="M31.89,72.67 L 43.28 73.07 54.68 73.07 66.07 73.07 77.46 73.07 88.85 9.01 100.24 9.82 111.64 11.83 123.03 17.48 134.42 17.48"/>
       </g>
-      <g class="geometry" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-11">
-        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-12">
-          <circle cx="31.89" cy="73.07" r="0.9"/>
+      <g class="geometry" id="fig-74656c1f2802434d8d525d460c8e7000-element-11">
+        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-74656c1f2802434d8d525d460c8e7000-element-12">
+          <circle cx="31.89" cy="72.67" r="0.9"/>
           <circle cx="43.28" cy="73.07" r="0.9"/>
-          <circle cx="54.68" cy="72.67" r="0.9"/>
-          <circle cx="66.07" cy="72.67" r="0.9"/>
+          <circle cx="54.68" cy="73.07" r="0.9"/>
+          <circle cx="66.07" cy="73.07" r="0.9"/>
           <circle cx="77.46" cy="73.07" r="0.9"/>
-          <circle cx="88.85" cy="7.81" r="0.9"/>
-          <circle cx="100.24" cy="8.21" r="0.9"/>
-          <circle cx="111.64" cy="15.46" r="0.9"/>
-          <circle cx="123.03" cy="16.67" r="0.9"/>
-          <circle cx="134.42" cy="16.27" r="0.9"/>
+          <circle cx="88.85" cy="9.01" r="0.9"/>
+          <circle cx="100.24" cy="9.82" r="0.9"/>
+          <circle cx="111.64" cy="11.83" r="0.9"/>
+          <circle cx="123.03" cy="17.48" r="0.9"/>
+          <circle cx="134.42" cy="17.48" r="0.9"/>
         </g>
       </g>
     </g>
-    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-13">
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-14">
+    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-74656c1f2802434d8d525d460c8e7000-element-13">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-74656c1f2802434d8d525d460c8e7000-element-14">
         <rect x="129.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-15">
+        <g class="button_logo" fill="#6A6A6A" id="fig-74656c1f2802434d8d525d460c8e7000-element-15">
           <path d="M130.22,9.6 L 131.02 9.6 131.02 8.8 131.82 8.8 131.82 9.6 132.62 9.6 132.62 10.4 131.82 10.4 131.82 11.2 131.02 11.2 131.02 10.4 130.22 10.4 z"/>
         </g>
       </g>
-      <g fill="#EAEAEA" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-16">
+      <g fill="#EAEAEA" id="fig-74656c1f2802434d8d525d460c8e7000-element-16">
         <rect x="109.92" y="8" width="19" height="4"/>
       </g>
-      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17">
+      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-74656c1f2802434d8d525d460c8e7000-element-17">
         <rect x="118.42" y="8" width="2" height="4"/>
       </g>
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-18">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-74656c1f2802434d8d525d460c8e7000-element-18">
         <rect x="105.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-19">
+        <g class="button_logo" fill="#6A6A6A" id="fig-74656c1f2802434d8d525d460c8e7000-element-19">
           <path d="M106.22,9.6 L 108.62 9.6 108.62 10.4 106.22 10.4 z"/>
         </g>
       </g>
     </g>
   </g>
-  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-20">
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-74656c1f2802434d8d525d460c8e7000-element-20">
     <text x="17.5" y="168.36" text-anchor="end" dy="0.35em" gadfly:scale="1.0" visibility="hidden">0.35</text>
     <text x="17.5" y="150.43" text-anchor="end" dy="0.35em" gadfly:scale="1.0" visibility="hidden">0.40</text>
     <text x="17.5" y="132.5" text-anchor="end" dy="0.35em" gadfly:scale="1.0" visibility="hidden">0.45</text>
@@ -7264,12 +7203,12 @@ fig.select("#fig-3f54ecb2afae43efb2f60447306cc4db-element-254")
     <text x="17.5" y="-57.54" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.98</text>
     <text x="17.5" y="-64.71" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.00</text>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-21">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-74656c1f2802434d8d525d460c8e7000-element-21">
     <text x="8.81" y="42.86" text-anchor="end" dy="0.35em">y</text>
   </g>
 </g>
 <defs>
-<clipPath id="fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-5">
+<clipPath id="fig-74656c1f2802434d8d525d460c8e7000-element-5">
   <path d="M18.5,5 L 136.42 5 136.42 80.72 18.5 80.72" />
 </clipPath
 ></defs>
@@ -8206,8 +8145,8 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82");
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-4")
+    var fig = Snap("#fig-74656c1f2802434d8d525d460c8e7000");
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-4")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -8215,63 +8154,63 @@ fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-4")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-7")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-7")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-7")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-7")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-8")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-8")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-8")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-8")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-14")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-14")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-14")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-14")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-14")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-14")
    .click(Gadfly.zoomslider_zoomin_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-16")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-16")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-16")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-16")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-16")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-16")
    .click(Gadfly.zoomslider_track_click);
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-17")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-17")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-17")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-17")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-17")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-17")
    .drag(Gadfly.zoomslider_thumb_dragmove,
      Gadfly.zoomslider_thumb_dragstart,
      Gadfly.zoomslider_thumb_dragend)
 .mousedown(Gadfly.zoomslider_thumb_mousedown)
 .mouseup(Gadfly.zoomslider_thumb_mouseup)
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-18")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-18")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-18")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-18")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-d9f1d4157f2340a3ac3f9c2b8663cc82-element-18")
+fig.select("#fig-74656c1f2802434d8d525d460c8e7000-element-18")
    .click(Gadfly.zoomslider_zoomout_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
