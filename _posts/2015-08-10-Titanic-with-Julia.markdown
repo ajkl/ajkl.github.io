@@ -27,41 +27,23 @@ training set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.cs
 test set: http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv  
 I have them downloaded in the data directory.  
 
-
     using DataFrames
-
 
     train = readtable("data/train.csv")
     head(train)
 
-
-
-
 <table class="data-frame"><tr><th></th><th>PassengerId</th><th>Survived</th><th>Pclass</th><th>Name</th><th>Sex</th><th>Age</th><th>SibSp</th><th>Parch</th><th>Ticket</th><th>Fare</th><th>Cabin</th><th>Embarked</th></tr><tr><th>1</th><td>1</td><td>0</td><td>3</td><td>Braund, Mr. Owen Harris</td><td>male</td><td>22.0</td><td>1</td><td>0</td><td>A/5 21171</td><td>7.25</td><td>NA</td><td>S</td></tr><tr><th>2</th><td>2</td><td>1</td><td>1</td><td>Cumings, Mrs. John Bradley (Florence Briggs Thayer)</td><td>female</td><td>38.0</td><td>1</td><td>0</td><td>PC 17599</td><td>71.2833</td><td>C85</td><td>C</td></tr><tr><th>3</th><td>3</td><td>1</td><td>3</td><td>Heikkinen, Miss. Laina</td><td>female</td><td>26.0</td><td>0</td><td>0</td><td>STON/O2. 3101282</td><td>7.925</td><td>NA</td><td>S</td></tr><tr><th>4</th><td>4</td><td>1</td><td>1</td><td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td><td>female</td><td>35.0</td><td>1</td><td>0</td><td>113803</td><td>53.1</td><td>C123</td><td>S</td></tr><tr><th>5</th><td>5</td><td>0</td><td>3</td><td>Allen, Mr. William Henry</td><td>male</td><td>35.0</td><td>0</td><td>0</td><td>373450</td><td>8.05</td><td>NA</td><td>S</td></tr><tr><th>6</th><td>6</td><td>0</td><td>3</td><td>Moran, Mr. James</td><td>male</td><td>NA</td><td>0</td><td>0</td><td>330877</td><td>8.4583</td><td>NA</td><td>Q</td></tr></table>
-
-
 
 
     test = readtable("data/test.csv")
     head(test)
 
-
-
-
 <table class="data-frame"><tr><th></th><th>PassengerId</th><th>Pclass</th><th>Name</th><th>Sex</th><th>Age</th><th>SibSp</th><th>Parch</th><th>Ticket</th><th>Fare</th><th>Cabin</th><th>Embarked</th></tr><tr><th>1</th><td>892</td><td>3</td><td>Kelly, Mr. James</td><td>male</td><td>34.5</td><td>0</td><td>0</td><td>330911</td><td>7.8292</td><td>NA</td><td>Q</td></tr><tr><th>2</th><td>893</td><td>3</td><td>Wilkes, Mrs. James (Ellen Needs)</td><td>female</td><td>47.0</td><td>1</td><td>0</td><td>363272</td><td>7.0</td><td>NA</td><td>S</td></tr><tr><th>3</th><td>894</td><td>2</td><td>Myles, Mr. Thomas Francis</td><td>male</td><td>62.0</td><td>0</td><td>0</td><td>240276</td><td>9.6875</td><td>NA</td><td>Q</td></tr><tr><th>4</th><td>895</td><td>3</td><td>Wirz, Mr. Albert</td><td>male</td><td>27.0</td><td>0</td><td>0</td><td>315154</td><td>8.6625</td><td>NA</td><td>S</td></tr><tr><th>5</th><td>896</td><td>3</td><td>Hirvonen, Mrs. Alexander (Helga E Lindqvist)</td><td>female</td><td>22.0</td><td>1</td><td>1</td><td>3101298</td><td>12.2875</td><td>NA</td><td>S</td></tr><tr><th>6</th><td>897</td><td>3</td><td>Svensson, Mr. Johan Cervin</td><td>male</td><td>14.0</td><td>0</td><td>0</td><td>7538</td><td>9.225</td><td>NA</td><td>S</td></tr></table>
-
-
 
 
     size(train, 1)
 
-
-
-
     891
-
-
-
 
 Lets take a closer look at our datasets. ```describe()``` helps us to summarize the entire dataset.
 
@@ -180,9 +162,6 @@ If you want to just check the datatypes of the columns you can use ```eltypes()`
 
     eltypes(train)
 
-
-
-
     12-element Array{Type{T<:Top},1}:
      Int64     
      Int64     
@@ -208,13 +187,9 @@ It is the equivalent of ```table()``` in R.
 
     counts(train[:Survived])
 
-
-
-
     2-element Array{Int64,1}:
      549
      342
-
 
 
 ```countmap()``` for rescue! Countmap gives you a dictionary of ```value => frequency```
@@ -222,34 +197,21 @@ It is the equivalent of ```table()``` in R.
 
     countmap(train[:Survived])
 
-
-
-
     Dict{Union(NAtype,Int64),Int64} with 2 entries:
       0 => 549
       1 => 342
-
-
 
 If you want proportions like ```prop.table()``` in R, you can use ```proportions()``` or ```proportionmap()```
 
 
     proportions(train[:Survived])
 
-
-
-
     2-element Array{Float64,1}:
      0.616162
      0.383838
 
 
-
-
     proportionmap(train[:Survived])
-
-
-
 
     Dict{Union(NAtype,Int64),Float64} with 2 entries:
       0 => 0.6161616161616161
@@ -261,9 +223,6 @@ If you want proportions like ```prop.table()``` in R, you can use ```proportions
 
 
     countmap(train[:Sex])
-
-
-
 
     Dict{Union(NAtype,UTF8String),Int64} with 2 entries:
       "male"   => 577
@@ -279,9 +238,6 @@ We will examine this using a stacked histogram of Sex vs Survived using Gadfly p
 
 
     plot(train, x="Sex", y="Survived", color="Survived", Geom.histogram(position=:stack), Scale.color_discrete_manual("red","green"))
-
-
-
 
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
