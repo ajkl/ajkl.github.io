@@ -17,7 +17,7 @@ This is an introduction to Data Analysis and Decision Trees using Julia. In this
 
 
 
-![png](output_1_0.png)
+![png](img/Julia_benchmark.png)
 
 
 
