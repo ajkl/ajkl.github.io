@@ -4,7 +4,7 @@ title:      "Titanic with Julia"
 subtitle:   ""
 date:       2015-08-10 12:00:00
 author:     ""
-header-img: "img/post-bg-06.jpg"
+header-img: "img/decision_tree.jpg"
 ---
 
 # Julia on Titanic
