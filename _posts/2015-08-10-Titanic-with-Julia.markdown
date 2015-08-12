@@ -4818,6 +4818,7 @@ Before doing that we need to handle the missing data in our feature variables. T
 1. Mean value if the variable is numeric.
 2. Max frequency categorical variable value for categorical variables.
 
+```
     countmap(train[:Embarked])
     
     Dict{Union(NAtype,UTF8String),Int64} with 4 entries:
@@ -4836,32 +4837,19 @@ Before doing that we need to handle the missing data in our feature variables. T
     train[isna(train[:Age]), :Age] = meanAge
 
     29.69911764705882
-
-
+```
 
 Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
 We will be using the ``DecisionTree``` julia package.  
 Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
 
-
+```
     using DecisionTree
-
 
     train[:Age] = float64(train[:Age])
     train[:Fare] = float64(train[:Fare])
     features = array(train[:,[:Pclass, :Sex, :Age, :SibSp, :Parch, :Fare, :Embarked, :Child]])
     labels=array(train[:Survived])
-
-    WARNING: array(da::DataArray{T}) is deprecated.
-    Use convert(Array, da).
-     in array at /Users/ajkale/.julia/v0.3/DataArrays/src/deprecated.jl:23
-     in include_string at loading.jl:97
-     in execute_request_0x535c5df2 at /Users/ajkale/.julia/v0.3/IJulia/src/execute_request.jl:157
-     in eventloop at /Users/ajkale/.julia/v0.3/IJulia/src/IJulia.jl:123
-     in anonymous at task.jl:340
-
-
-
 
 
     891-element Array{Int64,1}:
@@ -4893,12 +4881,7 @@ Features form the predictors and labels are the response variables for the decis
      0
 
 
-
-
     features
-
-
-
 
     891x8 Array{Any,2}:
      3  "male"    22.0     1  0   7.25    "S"  0
@@ -4928,7 +4911,7 @@ Features form the predictors and labels are the response variables for the decis
      1  "male"    26.0     0  0  30.0     "C"  0
      3  "male"    32.0     0  0   7.75    "Q"  0
 
-
+```
 
 ## Stumps
 A stump is the simplest decision tree, with only one split and two classification nodes (leaves). It tries to generate a single split with most predictive power. This is performed by splitting the dataset into 2 subset and returning the split with highest information gain. We will use the ```build_stumps``` api from DecisionTree and feed it with the above generated labels and features.
