@@ -4818,6 +4818,7 @@ Before doing that we need to handle the missing data in our feature variables. T
 1. Mean value if the variable is numeric.
 2. Max frequency categorical variable value for categorical variables.
 
+
 ```
     countmap(train[:Embarked])
     
@@ -4840,7 +4841,7 @@ Before doing that we need to handle the missing data in our feature variables. T
 ```
 
 Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
-We will be using the ``DecisionTree``` julia package.  
+We will be using the ```DecisionTree``` julia package.  
 Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
 
 ```
