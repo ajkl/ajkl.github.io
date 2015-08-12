@@ -261,9 +261,6 @@ If you want proportions like `prop.table()` in R, you can use `proportions()` or
 
     countmap(train[:Sex])
 
-
-
-
     Dict{Union(NAtype,UTF8String),Int64} with 2 entries:
       "male"   => 577
       "female" => 314
@@ -4819,7 +4816,7 @@ Before doing that we need to handle the missing data in our feature variables. T
 2. Max frequency categorical variable value for categorical variables.
 
 
-```
+
     countmap(train[:Embarked])
     
     Dict{Union(NAtype,UTF8String),Int64} with 4 entries:
@@ -4838,13 +4835,13 @@ Before doing that we need to handle the missing data in our feature variables. T
     train[isna(train[:Age]), :Age] = meanAge
 
     29.69911764705882
-```
+
 
 Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
 We will be using the `DecisionTree` julia package.  
 Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
 
-```
+
     using DecisionTree
 
     train[:Age] = float64(train[:Age])
@@ -4912,7 +4909,7 @@ Features form the predictors and labels are the response variables for the decis
      1  "male"    26.0     0  0  30.0     "C"  0
      3  "male"    32.0     0  0   7.75    "Q"  0
 
-```
+
 
 ## Stumps
 A stump is the simplest decision tree, with only one split and two classification nodes (leaves). It tries to generate a single split with most predictive power. This is performed by splitting the dataset into 2 subset and returning the split with highest information gain. We will use the `build_stumps` api from DecisionTree and feed it with the above generated labels and features.
