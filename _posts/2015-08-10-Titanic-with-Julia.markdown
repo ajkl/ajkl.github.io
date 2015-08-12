@@ -4818,45 +4818,22 @@ Before doing that we need to handle the missing data in our feature variables. T
 1. Mean value if the variable is numeric.
 2. Max frequency categorical variable value for categorical variables.
 
-
     countmap(train[:Embarked])
-
-
-
-
+    
     Dict{Union(NAtype,UTF8String),Int64} with 4 entries:
       "Q" => 77
       "S" => 644
       "C" => 168
       NA  => 2
-
-
-
-
+    
     train[isna(train[:Embarked]), :Embarked] = "S"
-
-
-
-
     "S"
-
-
-
-
+    
     meanAge = mean(train[!isna(train[:Age]), :Age])
-
-
-
-
+    
     29.69911764705882
 
-
-
-
     train[isna(train[:Age]), :Age] = meanAge
-
-
-
 
     29.69911764705882
 
