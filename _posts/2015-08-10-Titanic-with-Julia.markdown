@@ -15,7 +15,7 @@ The benchmark numbers on the Julia website look pretty impressive. So get ready 
 
 ![benchmark](https://raw.githubusercontent.com/ajkl/ajkl.github.io/master/img/Julia_benchmark.png)
 
-Lets get started. We will mostly be using 3 main packages from Julia ecosystem   
+Let's get started. We will mostly be using 3 main packages from Julia ecosystem   
 
 * [DataFrames](https://github.com/JuliaStats/DataFrames.jl)
 * [Gadfly](http://gadflyjl.org/)
@@ -63,7 +63,7 @@ I have them downloaded in the data directory.
 
 
 
-Lets take a closer look at our datasets. `describe()` helps us to summarize the entire dataset.
+Let's take a closer look at our datasets. `describe()` helps us to summarize the entire dataset.
 
 
     describe(train)
@@ -200,7 +200,7 @@ If you want to just check the datatypes of the columns you can use `eltypes()`
 
 
 ## Data Analysis
-Lets get our hand real dirty now. We want to check how many people survived the disaster. Its good to know how the distribution looks like on the classification classes.  
+Let's get our hand real dirty now. We want to check how many people survived the disaster. Its good to know how the distribution looks like on the classification classes.  
 
 `counts()` will give you a frequency table, but it does not tell you how the split is.
 It is the equivalent of `table()` in R.
@@ -1699,9 +1699,9 @@ fig.select("#fig-8cb17422ee6242b29bb8c9357ec0f6f7-element-189")
 
 
 Its pretty clear that more females survived over males.  
-So lets predict Survived=1 if Sex=female else Survived=0. With that you have your first predictive model ready!!
+So let's predict Survived=1 if Sex=female else Survived=0. With that you have your first predictive model ready!!
 
-But lets not stop there, we have lot more dimensions to the data. Lets see if we can make use of those to enhance the model. We have Age as one of the columns, using which we can create another dimension to the data - a variable indicating whether the person was a child or not.
+But let's not stop there, we have lot more dimensions to the data. Let's see if we can make use of those to enhance the model. We have Age as one of the columns, using which we can create another dimension to the data - a variable indicating whether the person was a child or not.
 
 
     train[:Child] = 1
@@ -1717,7 +1717,7 @@ But lets not stop there, we have lot more dimensions to the data. Lets see if we
 
 
 
-Now that we have our Child indicator variable, lets try to plot the survival rate of children on Titanic.
+Now that we have our Child indicator variable, let's try to plot the survival rate of children on Titanic.
 
 
     plot(train, x="Child", y="Survived", color="Survived", Geom.histogram(position=:stack), Scale.color_discrete_manual("red","green"))
@@ -4839,7 +4839,7 @@ From describe() above we have seen that Embarked and Age have some missing value
     29.69911764705882
 
 
-Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
+Now that we knocked out the NAs out of our way, let's roll up our sleeves and grow a decision tree!
 We will be using the `DecisionTree` julia package.  
 Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
 
@@ -4931,7 +4931,7 @@ Hence the 314 on L and 577 on R - number of female and male datapoints (respecti
 `R -> 0` implies Survived=0 is on right branch  
 This creates a basic 1-rules tree with deciding factor being gender of the person.
 
-Lets verify the split by predicting on the training data.
+Let's verify the split by predicting on the training data.
 
     predictions = apply_tree(stump, features)
     confusion_matrix(labels, predictions)
@@ -4950,7 +4950,7 @@ This gives use an accuracy of 1-190/891 = 0.7867
 
 
 ## Decision Trees
-Now that we have our 1-level decision stump, lets bring it all together and build our first multi-split decision tree.  
+Now that we have our 1-level decision stump, let's bring it all together and build our first multi-split decision tree.  
 More details coming soon ...
 
 
