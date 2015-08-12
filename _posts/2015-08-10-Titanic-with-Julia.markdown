@@ -62,7 +62,7 @@ I have them downloaded in the data directory.
 
 
 
-Lets take a closer look at our datasets. ```describe()``` helps us to summarize the entire dataset.
+Lets take a closer look at our datasets. `describe()` helps us to summarize the entire dataset.
 
 
     describe(train)
@@ -174,7 +174,7 @@ Lets take a closer look at our datasets. ```describe()``` helps us to summarize 
     
 
 
-If you want to just check the datatypes of the columns you can use ```eltypes()```
+If you want to just check the datatypes of the columns you can use `eltypes()`
 
 
     eltypes(train)
@@ -201,8 +201,8 @@ If you want to just check the datatypes of the columns you can use ```eltypes()`
 ## Data Analysis
 Lets get our hand real dirty now. We want to check how many people survived the disaster. Its good to know how the distribution looks like on the classification classes.  
 
-```counts()``` will give you a frequency table, but it does not tell you how the split is.
-It is the equivalent of ```table()``` in R.
+`counts()` will give you a frequency table, but it does not tell you how the split is.
+It is the equivalent of `table()` in R.
 
 
     counts(train[:Survived])
@@ -216,7 +216,7 @@ It is the equivalent of ```table()``` in R.
 
 
 
-```countmap()``` for rescue! Countmap gives you a dictionary of ```value => frequency```
+`countmap()` for rescue! Countmap gives you a dictionary of `value => frequency`
 
 
     countmap(train[:Survived])
@@ -230,7 +230,7 @@ It is the equivalent of ```table()``` in R.
 
 
 
-If you want proportions like ```prop.table()``` in R, you can use ```proportions()``` or ```proportionmap()```
+If you want proportions like `prop.table()` in R, you can use `proportions()` or `proportionmap()`
 
 
     proportions(train[:Survived])
@@ -256,7 +256,7 @@ If you want proportions like ```prop.table()``` in R, you can use ```proportions
 
 
 
-```Counts()``` does not work for categorical variables, so you can use ```countmap()`` there.
+`Counts` does not work for categorical variables, so you can use `countmap()` there.
 
 
     countmap(train[:Sex])
@@ -4841,7 +4841,7 @@ Before doing that we need to handle the missing data in our feature variables. T
 ```
 
 Now that we knocked out the NAs out of our way, lets roll up our sleeves and grow a decision tree!
-We will be using the ```DecisionTree``` julia package.  
+We will be using the `DecisionTree` julia package.  
 Features form the predictors and labels are the response variables for the decision tree. We will start with building the Arrays for features and labels.
 
 ```
@@ -4915,7 +4915,7 @@ Features form the predictors and labels are the response variables for the decis
 ```
 
 ## Stumps
-A stump is the simplest decision tree, with only one split and two classification nodes (leaves). It tries to generate a single split with most predictive power. This is performed by splitting the dataset into 2 subset and returning the split with highest information gain. We will use the ```build_stumps``` api from DecisionTree and feed it with the above generated labels and features.
+A stump is the simplest decision tree, with only one split and two classification nodes (leaves). It tries to generate a single split with most predictive power. This is performed by splitting the dataset into 2 subset and returning the split with highest information gain. We will use the `build_stumps` api from DecisionTree and feed it with the above generated labels and features.
 
 
     stump = build_stump(labels, features)
