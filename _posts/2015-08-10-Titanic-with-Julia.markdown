@@ -4918,66 +4918,39 @@ A stump is the simplest decision tree, with only one split and two classificatio
 
     stump = build_stump(labels, features)
     print_tree(stump)
-    accuracy = nfoldCV_tree(labels, features, 0.9, 3)
 
     Feature 2, Threshold male
     L-> 1 : 233/314
     R-> 0 : 468/577
     
-    Fold 
+The stump picks feature 2, Sex to make the split with threshold being "male". 
+The interpretation being - all males data points to the right leaf and all female datapoints go to the left leaf.
+Hence the 314 on L and 577 on R - number of female and male datapoints (respectively) in train set.  
+`L -> 1` implies Survived=1 is on left branch    
+`R -> 0` implies Survived=0 is on right branch  
+This creates a basic 1-rules tree with deciding factor being gender of the person.
 
+Lets verify the split by predicting on the training data.
 
+    predictions = apply_tree(stump, features)
+    confusion_matrix(labels, predictions)
+    
     2x2 Array{Int64,2}:
-     150  34
-      27  86
-
-
-    1
+     468   81
+     109  233
+    
     Classes:  {0,1}
     Matrix:   
-    Accuracy: 
+    Accuracy: 0.7867564534231201
+    Kappa:    0.5421129503407983
+
+Since we predict male who survived and females who didnt survive wrongly we get a miclassification count of 81 + 109.
+This gives use an accuracy of 1-190/891 = 0.7867
 
 
-    2x2 Array{Int64,2}:
-     146  36
-      39  76
-
-
-    0.7946127946127947
-    Kappa:    0.5694731589078207
-    
-    Fold 2
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7474747474747475
-    Kappa:    0.4653016154972516
-    
-    Fold 
-
-
-    2x2 Array{Int64,2}:
-     151  32
-      35  79
-
-
-    3
-    Classes:  {0,1}
-    Matrix:   
-    Accuracy: 0.7744107744107744
-    Kappa:    0.5207023628874919
-    
-    Mean Accuracy: 0.7721661054994389
-
-
-
-
-
-    3-element Array{Float64,1}:
-     0.794613
-     0.747475
-     0.774411
-
-
+## Decision Trees
+Now that we have our 1-level decision stump, lets bring it all together and build our first multi-split decision tree.  
+More details coming soon ...
 
 
     model = build_tree(labels, features)
