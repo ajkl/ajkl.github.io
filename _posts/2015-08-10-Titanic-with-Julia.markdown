@@ -1717,7 +1717,7 @@ But lets not stop there, we have lot more dimensions to the data. Lets see if we
 
 
 
-Not that we have our Child indicator variable, lets try to plot the survival rate of children on Titanic.
+Now that we have our Child indicator variable, lets try to plot the survival rate of children on Titanic.
 
 
     plot(train, x="Child", y="Survived", color="Survived", Geom.histogram(position=:stack), Scale.color_discrete_manual("red","green"))
