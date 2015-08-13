@@ -5027,7 +5027,7 @@ Although we have a nice looking decision tree ready, we have a bunch of problems
 
 Solution - Tree Pruning
 
-From [wikipedia/Pruning_(decision_trees)](https://en.wikipedia.org/wiki/Pruning_(decision_trees))
+From [wikipedia/Pruning_decision_tree](https://en.wikipedia.org/wiki/Pruning_(decision_trees))
 
 "Pruning is a technique in machine learning that reduces the size of decision trees by removing sections of the tree that provide little power to classify instances. Pruning reduces the complexity of the final classifier, and hence improves predictive accuracy by the reduction of overfitting."
 
