@@ -5,6 +5,7 @@ subtitle:   ""
 date:       2015-07-22 12:00:00
 author:     ""
 header-img: "img/post-bg-05.jpg"
+tag: R, parallel
 ---
 
 I had a csv with 5 columns with one of the columns having image urls (picture_url) and one of them having the image id (id).
